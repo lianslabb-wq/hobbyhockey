@@ -1,0 +1,81 @@
+import { teams } from '../lib/mockData'
+
+export default function RequestCard({ request, session, onRespond, isGoalieView }) {
+  const team = teams.find((t) => t.id === request.teamId)
+  if (!team || !session) return null
+
+  const statusStyles = {
+    open: 'bg-goal-red/15 text-goal-red-light border-goal-red/30',
+    filled: 'bg-goal-green/15 text-goal-green border-goal-green/30',
+    cancelled: 'bg-rink-lighter text-ice-muted border-rink-border',
+  }
+
+  const typeLabels = {
+    favorites: 'Riktad',
+    open: 'Öppen',
+  }
+
+  return (
+    <div className="bg-rink-light border border-rink-border rounded-lg p-5 hover:border-rink-lighter transition-colors">
+      <div className="flex items-start justify-between mb-4">
+        <div>
+          <h3 className="font-display text-lg font-bold uppercase tracking-wide">{team.name}</h3>
+          <p className="text-ice-muted text-sm">{team.location}</p>
+        </div>
+        <div className="flex gap-2">
+          <span className={`px-2.5 py-1 rounded border text-xs font-semibold uppercase tracking-wider ${statusStyles[request.status]}`}>
+            {request.status === 'open' ? 'Söker' : request.status === 'filled' ? 'Tillsatt' : 'Avbokad'}
+          </span>
+          <span className="px-2.5 py-1 rounded border border-jersey-blue/30 text-xs font-semibold uppercase tracking-wider text-jersey-blue bg-jersey-blue/10">
+            {typeLabels[request.type]}
+          </span>
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-4 mb-4 text-sm">
+        <div>
+          <p className="text-ice-muted/60 mb-1 text-xs uppercase tracking-wider">Datum</p>
+          <p className="font-semibold text-white">{session.date}</p>
+        </div>
+        <div>
+          <p className="text-ice-muted/60 mb-1 text-xs uppercase tracking-wider">Tid</p>
+          <p className="font-semibold text-white">{session.time}</p>
+        </div>
+        <div>
+          <p className="text-ice-muted/60 mb-1 text-xs uppercase tracking-wider">Plats</p>
+          <p className="font-semibold text-white">{session.rink}</p>
+        </div>
+      </div>
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-ice-muted/40 uppercase tracking-wider">{session.type}</p>
+        {isGoalieView && request.status === 'open' && (
+          <div className="flex gap-2">
+            <button
+              onClick={() => onRespond?.(request.id, 'yes')}
+              className="px-5 py-2 bg-goal-green text-white rounded text-sm font-semibold uppercase tracking-wider hover:bg-goal-green/80 transition-colors cursor-pointer"
+            >
+              Jag kan!
+            </button>
+            <button
+              onClick={() => onRespond?.(request.id, 'no')}
+              className="px-5 py-2 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer"
+            >
+              Kan inte
+            </button>
+          </div>
+        )}
+      </div>
+      {request.responses.length > 0 && (
+        <div className="mt-4 pt-4 border-t border-rink-border">
+          <p className="text-xs text-ice-muted/60 mb-2 uppercase tracking-wider">Svar ({request.responses.length})</p>
+          {request.responses.map((r, i) => (
+            <div key={i} className="flex items-center gap-2 text-sm">
+              <span className={`w-2 h-2 rounded-full ${r.answer === 'yes' ? 'bg-goal-green' : 'bg-goal-red'}`} />
+              <span className="text-white">{r.goalieName}</span>
+              <span className="text-ice-muted/40">{r.answer === 'yes' ? 'Tillgänglig' : 'Kan inte'}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}

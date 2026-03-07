@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ice: #f0f6fa;
+  --color-ice-muted: #8a9bb0;
+  --color-rink: #0a0a0a;
+  --color-rink-light: #141414;
+  --color-rink-lighter: #222222;
+  --color-rink-border: #2a2a2a;
+  --color-puck: #000000;
+  --color-goal-red: #c8102e;
+  --color-goal-red-light: #e8253f;
+  --color-goal-green: #00c853;
+  --color-stick-gold: #f4a261;
+  --color-jersey-blue: #00b4d8;
+  --color-jersey-blue-light: #48cae4;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Oswald', 'Impact', system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-rink);
+  color: var(--color-ice);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background-color: var(--color-goal-red);
+  color: white;
+}

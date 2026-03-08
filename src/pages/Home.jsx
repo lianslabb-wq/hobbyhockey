@@ -15,11 +15,19 @@ export default function Home() {
             Vi kopplar ihop veteranhockeylag med tillgängliga målvakter — snabbt och enkelt.
           </p>
         </div>
-        {/* Hero image — replace src with your generated image */}
-        <div className="hidden lg:flex items-center justify-end">
-          <div className="w-full h-80 rounded-lg bg-gradient-to-br from-rink-light via-rink to-puck flex items-center justify-center border border-rink-border">
-            <p className="text-ice-muted/30 font-display uppercase tracking-widest text-sm">Hero-bild kommer här</p>
-          </div>
+        {/* Hero image with fade-to-black edges */}
+        <div className="hidden lg:block relative">
+          <img
+            src="/hero.jpg"
+            alt="Ishockey"
+            className="w-full h-96 object-cover rounded-r-lg"
+          />
+          {/* Fade left edge into background */}
+          <div className="absolute inset-0 bg-gradient-to-r from-rink via-rink/60 to-transparent" />
+          {/* Fade bottom edge */}
+          <div className="absolute inset-0 bg-gradient-to-t from-rink via-transparent to-transparent" />
+          {/* Subtle fade top */}
+          <div className="absolute inset-0 bg-gradient-to-b from-rink/40 to-transparent" />
         </div>
       </div>
 

@@ -1,8 +1,8 @@
-import { teams } from '../lib/mockData'
+export default function RequestCard({ request, session, team: teamProp, onRespond, isGoalieView }) {
+  if (!session) return null
 
-export default function RequestCard({ request, session, onRespond, isGoalieView }) {
-  const team = teams.find((t) => t.id === request.teamId)
-  if (!team || !session) return null
+  const teamName = teamProp?.name || request.teams?.name || 'Lag'
+  const teamLocation = teamProp?.location || request.teams?.location || ''
 
   const statusStyles = {
     open: 'bg-goal-red/15 text-goal-red-light border-goal-red/30',
@@ -19,15 +19,15 @@ export default function RequestCard({ request, session, onRespond, isGoalieView 
     <div className="bg-rink-light border border-rink-border rounded-lg p-5 hover:border-rink-lighter transition-colors">
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h3 className="font-display text-lg font-bold uppercase tracking-wide">{team.name}</h3>
-          <p className="text-ice-muted text-sm">{team.location}</p>
+          <h3 className="font-display text-lg font-bold uppercase tracking-wide">{teamName}</h3>
+          <p className="text-ice-muted text-sm">{teamLocation}</p>
         </div>
         <div className="flex gap-2">
           <span className={`px-2.5 py-1 rounded border text-xs font-semibold uppercase tracking-wider ${statusStyles[request.status]}`}>
             {request.status === 'open' ? 'Söker' : request.status === 'filled' ? 'Tillsatt' : 'Avbokad'}
           </span>
           <span className="px-2.5 py-1 rounded border border-jersey-blue/30 text-xs font-semibold uppercase tracking-wider text-jersey-blue bg-jersey-blue/10">
-            {typeLabels[request.type]}
+            {typeLabels[request.type] || 'Öppen'}
           </span>
         </div>
       </div>
@@ -64,7 +64,7 @@ export default function RequestCard({ request, session, onRespond, isGoalieView 
           </div>
         )}
       </div>
-      {request.responses.length > 0 && (
+      {request.responses?.length > 0 && (
         <div className="mt-4 pt-4 border-t border-rink-border">
           <p className="text-xs text-ice-muted/60 mb-2 uppercase tracking-wider">Svar ({request.responses.length})</p>
           {request.responses.map((r, i) => (

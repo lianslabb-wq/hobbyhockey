@@ -1,131 +1,329 @@
-import { useState } from 'react'
-import { teams, goalies, requests as initialRequests } from '../lib/mockData'
+import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabase'
+import { signUp, signIn, signOut, getUser } from '../lib/auth'
 import RequestCard from '../components/RequestCard'
 
 export default function TeamDashboard() {
-  const [selectedTeam, setSelectedTeam] = useState(null)
-  const [requests, setRequests] = useState(initialRequests)
+  const [user, setUser] = useState(null)
+  const [team, setTeam] = useState(null)
+  const [teams, setTeams] = useState([])
+  const [sessions, setSessions] = useState([])
+  const [requests, setRequests] = useState([])
+  const [favorites, setFavorites] = useState([])
   const [showNewRequest, setShowNewRequest] = useState(false)
-  const [newRequest, setNewRequest] = useState({ sessionId: '', type: 'favorites' })
+  const [newRequest, setNewRequest] = useState({ sessionId: '', type: 'open' })
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [mode, setMode] = useState('login')
 
-  if (!selectedTeam) {
+  // Auth form state
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  // Team registration form state
+  const [teamForm, setTeamForm] = useState({
+    name: '', type: 'Veteran', location: '', region: 'Stockholm',
+    contactName: '', contactEmail: '', calendarUrl: ''
+  })
+
+  useEffect(() => {
+    checkUser()
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
+  useEffect(() => {
+    if (user) loadTeam()
+  }, [user])
+
+  useEffect(() => {
+    if (team) {
+      loadSessions()
+      loadRequests()
+      loadFavorites()
+    }
+  }, [team])
+
+  async function checkUser() {
+    const u = await getUser()
+    setUser(u)
+    setLoading(false)
+  }
+
+  async function loadTeam() {
+    const { data } = await supabase.from('teams').select('*').eq('user_id', user.id)
+    if (data?.length > 0) {
+      setTeam(data[0])
+    }
+    // Also load all teams for display
+    const { data: allTeams } = await supabase.from('teams').select('*')
+    setTeams(allTeams || [])
+  }
+
+  async function loadSessions() {
+    const { data } = await supabase.from('sessions').select('*').eq('team_id', team.id).order('date')
+    setSessions(data || [])
+  }
+
+  async function loadRequests() {
+    const { data } = await supabase.from('requests').select('*, responses(*, goalies(*))').eq('team_id', team.id).order('created_at', { ascending: false })
+    setRequests(data || [])
+  }
+
+  async function loadFavorites() {
+    const { data } = await supabase.from('favorites').select('*, goalies(*)').eq('team_id', team.id)
+    setFavorites(data || [])
+  }
+
+  async function handleAuth(e) {
+    e.preventDefault()
+    setError('')
+    try {
+      if (mode === 'register') {
+        await signUp(email, password)
+        setMode('register-team')
+      } else {
+        await signIn(email, password)
+      }
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  async function handleRegisterTeam(e) {
+    e.preventDefault()
+    setError('')
+    try {
+      const { data, error: err } = await supabase.from('teams').insert({
+        name: teamForm.name,
+        type: teamForm.type,
+        location: teamForm.location,
+        region: teamForm.region,
+        contact_name: teamForm.contactName,
+        contact_email: teamForm.contactEmail,
+        calendar_url: teamForm.calendarUrl || null,
+        user_id: user.id,
+      }).select().single()
+      if (err) throw err
+      setTeam(data)
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  async function handleCreateSession(e) {
+    e.preventDefault()
+    const form = e.target
+    const { error: err } = await supabase.from('sessions').insert({
+      team_id: team.id,
+      date: form.date.value,
+      time: form.time.value,
+      type: form.type.value,
+      rink: form.rink.value,
+      needs_goalie: true,
+    })
+    if (!err) {
+      form.reset()
+      loadSessions()
+    }
+  }
+
+  async function handleCreateRequest() {
+    if (!newRequest.sessionId) return
+    const { error: err } = await supabase.from('requests').insert({
+      team_id: team.id,
+      session_id: newRequest.sessionId,
+      type: newRequest.type,
+      status: 'open',
+    })
+    if (!err) {
+      setShowNewRequest(false)
+      setNewRequest({ sessionId: '', type: 'open' })
+      loadRequests()
+    }
+  }
+
+  if (loading) return <p className="text-ice-muted">Laddar...</p>
+
+  // Not logged in — show login/register
+  if (!user) {
     return (
-      <div>
-        <h1 className="font-display text-3xl font-bold uppercase tracking-tight mb-2">Välj ditt lag</h1>
-        <p className="text-ice-muted mb-8">Logga in som lagansvarig för att hantera förfrågningar.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {teams.map((team) => (
-            <button
-              key={team.id}
-              onClick={() => setSelectedTeam(team)}
-              className="bg-rink-light border border-rink-border rounded-lg p-6 text-left hover:border-goal-red/50 transition-colors cursor-pointer group"
-            >
-              <h2 className="font-display text-xl font-bold uppercase tracking-wide mb-1 group-hover:text-goal-red-light transition-colors">{team.name}</h2>
-              <p className="text-sm text-ice-muted">{team.type} &middot; {team.location}</p>
-              <p className="text-sm text-ice-muted/60 mt-2">Kontakt: {team.contact}</p>
-            </button>
-          ))}
-        </div>
+      <div className="max-w-md mx-auto py-12">
+        <h1 className="font-display text-3xl font-bold uppercase tracking-tight mb-2">
+          {mode === 'login' ? 'Logga in som lag' : 'Registrera nytt lag'}
+        </h1>
+        <p className="text-ice-muted mb-8">
+          {mode === 'login' ? 'Logga in för att hantera ditt lag och söka målvakter.' : 'Skapa ett konto för att registrera ditt lag.'}
+        </p>
+        {error && <p className="text-goal-red mb-4 text-sm">{error}</p>}
+        <form onSubmit={handleAuth} className="bg-rink-light border border-rink-border rounded-lg p-6 space-y-4">
+          <div>
+            <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">E-post</label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
+              className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+          </div>
+          <div>
+            <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Lösenord</label>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
+              className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+          </div>
+          <button type="submit"
+            className="w-full py-2.5 bg-goal-red text-white rounded font-semibold text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer">
+            {mode === 'login' ? 'Logga in' : 'Skapa konto'}
+          </button>
+          <p className="text-center text-sm text-ice-muted/60">
+            {mode === 'login' ? (
+              <>Inget konto? <button type="button" onClick={() => setMode('register')} className="text-jersey-blue hover:text-jersey-blue-light bg-transparent border-none cursor-pointer">Registrera dig</button></>
+            ) : (
+              <>Har redan konto? <button type="button" onClick={() => setMode('login')} className="text-jersey-blue hover:text-jersey-blue-light bg-transparent border-none cursor-pointer">Logga in</button></>
+            )}
+          </p>
+        </form>
       </div>
     )
   }
 
-  const teamRequests = requests.filter((r) => r.teamId === selectedTeam.id)
-  const sessionsNeedingGoalie = selectedTeam.sessions.filter((s) => s.needsGoalie)
-  const teamFavorites = goalies.filter((g) => selectedTeam.favoriteGoalies.includes(g.id))
-
-  function handleCreateRequest() {
-    if (!newRequest.sessionId) return
-    const req = {
-      id: `r${Date.now()}`,
-      teamId: selectedTeam.id,
-      sessionId: newRequest.sessionId,
-      type: newRequest.type,
-      status: 'open',
-      createdAt: new Date().toISOString(),
-      responses: [],
-    }
-    setRequests([req, ...requests])
-    setShowNewRequest(false)
-    setNewRequest({ sessionId: '', type: 'favorites' })
+  // Logged in but no team — register team
+  if (!team) {
+    return (
+      <div className="max-w-lg mx-auto py-12">
+        <h1 className="font-display text-3xl font-bold uppercase tracking-tight mb-2">Registrera ditt lag</h1>
+        <p className="text-ice-muted mb-8">Fyll i uppgifterna nedan för att komma igång.</p>
+        {error && <p className="text-goal-red mb-4 text-sm">{error}</p>}
+        <form onSubmit={handleRegisterTeam} className="bg-rink-light border border-rink-border rounded-lg p-6 space-y-4">
+          <div>
+            <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Lagnamn</label>
+            <input type="text" value={teamForm.name} onChange={e => setTeamForm({...teamForm, name: e.target.value})} required placeholder="T.ex. Solna Hockey"
+              className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Typ</label>
+              <select value={teamForm.type} onChange={e => setTeamForm({...teamForm, type: e.target.value})}
+                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm">
+                <option>Veteran</option>
+                <option>Recreational</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Ort</label>
+              <input type="text" value={teamForm.location} onChange={e => setTeamForm({...teamForm, location: e.target.value})} required placeholder="T.ex. Solna"
+                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Kontaktperson</label>
+              <input type="text" value={teamForm.contactName} onChange={e => setTeamForm({...teamForm, contactName: e.target.value})} required placeholder="T.ex. Robban"
+                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Kontakt e-post</label>
+              <input type="email" value={teamForm.contactEmail} onChange={e => setTeamForm({...teamForm, contactEmail: e.target.value})} required
+                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Följkalender-URL (valfritt)</label>
+            <input type="url" value={teamForm.calendarUrl} onChange={e => setTeamForm({...teamForm, calendarUrl: e.target.value})} placeholder="https://sportadmin.se/cal/..."
+              className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+          </div>
+          <button type="submit"
+            className="w-full py-2.5 bg-goal-red text-white rounded font-semibold text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer">
+            Registrera lag
+          </button>
+        </form>
+      </div>
+    )
   }
+
+  // Team dashboard
+  const sessionsNeedingGoalie = sessions.filter(s => s.needs_goalie)
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <button onClick={() => setSelectedTeam(null)} className="text-sm text-ice-muted/60 hover:text-white mb-1 cursor-pointer bg-transparent border-none transition-colors">
-            ← Alla lag
-          </button>
-          <h1 className="font-display text-3xl font-bold uppercase tracking-tight">{selectedTeam.name}</h1>
-          <p className="text-ice-muted">{selectedTeam.type} &middot; {selectedTeam.location} &middot; Ansvarig: {selectedTeam.contact}</p>
+          <h1 className="font-display text-3xl font-bold uppercase tracking-tight">{team.name}</h1>
+          <p className="text-ice-muted">{team.type} &middot; {team.location} &middot; Ansvarig: {team.contact_name}</p>
         </div>
-        <button
-          onClick={() => setShowNewRequest(!showNewRequest)}
-          className="px-5 py-2.5 bg-goal-red text-white rounded font-semibold text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer"
-        >
-          + Sök målvakt
-        </button>
+        <div className="flex gap-2">
+          <button onClick={() => setShowNewRequest(!showNewRequest)}
+            className="px-5 py-2.5 bg-goal-red text-white rounded font-semibold text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer">
+            + Sök målvakt
+          </button>
+          <button onClick={async () => { await signOut(); setUser(null); setTeam(null) }}
+            className="px-4 py-2.5 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
+            Logga ut
+          </button>
+        </div>
       </div>
 
       {showNewRequest && (
         <div className="bg-rink-light border border-goal-red/30 rounded-lg p-6 mb-6">
           <h3 className="font-display text-lg font-bold uppercase tracking-wide mb-4">Ny förfrågan</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Tillfälle</label>
-              <select
-                value={newRequest.sessionId}
-                onChange={(e) => setNewRequest({ ...newRequest, sessionId: e.target.value })}
-                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm"
-              >
-                <option value="">Välj tillfälle...</option>
-                {sessionsNeedingGoalie.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.date} {s.time} — {s.type} @ {s.rink}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Skicka till</label>
-              <select
-                value={newRequest.type}
-                onChange={(e) => setNewRequest({ ...newRequest, type: e.target.value })}
-                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm"
-              >
-                <option value="favorites">Mina favoriter ({teamFavorites.length} st)</option>
-                <option value="open">Alla målvakter (öppen förfrågan)</option>
-              </select>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={handleCreateRequest}
-              className="px-5 py-2.5 bg-goal-red text-white rounded font-semibold text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer"
-            >
-              Skicka förfrågan
-            </button>
-            <button
-              onClick={() => setShowNewRequest(false)}
-              className="px-5 py-2.5 bg-rink-lighter text-ice-muted rounded font-semibold text-sm uppercase tracking-wider hover:text-white transition-colors cursor-pointer"
-            >
-              Avbryt
-            </button>
-          </div>
+          {sessionsNeedingGoalie.length === 0 ? (
+            <p className="text-ice-muted">Lägg till en tid först (se "Lägg till tid" nedan).</p>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Tillfälle</label>
+                  <select value={newRequest.sessionId} onChange={e => setNewRequest({...newRequest, sessionId: e.target.value})}
+                    className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm">
+                    <option value="">Välj tillfälle...</option>
+                    {sessionsNeedingGoalie.map(s => (
+                      <option key={s.id} value={s.id}>{s.date} {s.time} — {s.type} @ {s.rink}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Skicka till</label>
+                  <select value={newRequest.type} onChange={e => setNewRequest({...newRequest, type: e.target.value})}
+                    className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm">
+                    <option value="favorites">Mina favoriter ({favorites.length} st)</option>
+                    <option value="open">Alla målvakter (öppen förfrågan)</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={handleCreateRequest}
+                  className="px-5 py-2.5 bg-goal-red text-white rounded font-semibold text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer">
+                  Skicka förfrågan
+                </button>
+                <button onClick={() => setShowNewRequest(false)}
+                  className="px-5 py-2.5 bg-rink-lighter text-ice-muted rounded font-semibold text-sm uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
+                  Avbryt
+                </button>
+              </div>
+            </>
+          )}
         </div>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Förfrågningar</h2>
-          {teamRequests.length === 0 ? (
+          {requests.length === 0 ? (
             <p className="text-ice-muted/60">Inga aktiva förfrågningar.</p>
           ) : (
             <div className="space-y-4">
-              {teamRequests.map((req) => {
-                const session = selectedTeam.sessions.find((s) => s.id === req.sessionId)
-                return <RequestCard key={req.id} request={req} session={session} isGoalieView={false} />
+              {requests.map(req => {
+                const session = sessions.find(s => s.id === req.session_id)
+                if (!session) return null
+                const mapped = {
+                  ...req,
+                  teamId: req.team_id,
+                  sessionId: req.session_id,
+                  responses: (req.responses || []).map(r => ({
+                    goalieId: r.goalie_id,
+                    goalieName: r.goalies?.name || 'Okänd',
+                    answer: r.answer,
+                  })),
+                }
+                return <RequestCard key={req.id} request={mapped} session={session} isGoalieView={false} />
               })}
             </div>
           )}
@@ -133,45 +331,52 @@ export default function TeamDashboard() {
 
         <div>
           <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Favoritmålvakter</h2>
-          {teamFavorites.length === 0 ? (
+          {favorites.length === 0 ? (
             <p className="text-ice-muted/60 text-sm">Inga favoriter tillagda än.</p>
           ) : (
             <div className="space-y-2">
-              {teamFavorites.map((g) => (
-                <div key={g.id} className="bg-rink-light border border-rink-border rounded-lg p-4">
-                  <p className="font-semibold text-white">{g.name}</p>
-                  <p className="text-sm text-ice-muted">{g.location}</p>
-                  <p className="text-sm text-ice-muted/60">{g.phone}</p>
+              {favorites.map(f => (
+                <div key={f.id} className="bg-rink-light border border-rink-border rounded-lg p-4">
+                  <p className="font-semibold text-white">{f.goalies?.name}</p>
+                  <p className="text-sm text-ice-muted">{f.goalies?.location}</p>
                 </div>
               ))}
             </div>
           )}
 
           <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4 mt-8">Kommande tider</h2>
-          <div className="space-y-2">
-            {selectedTeam.sessions.map((s) => (
-              <div key={s.id} className={`rounded-lg p-3 text-sm border ${s.needsGoalie ? 'bg-goal-red/10 border-goal-red/30' : 'bg-rink-light border-rink-border'}`}>
-                <p className="font-semibold text-white">{s.date} {s.time}</p>
-                <p className="text-ice-muted">{s.type} @ {s.rink}</p>
-                {s.needsGoalie && <p className="text-goal-red text-xs mt-1 font-semibold uppercase tracking-wider">Saknar målvakt</p>}
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-8">
-            <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Kalender</h2>
-            <div className="bg-rink-light border border-rink-border rounded-lg p-4">
-              <p className="text-sm text-ice-muted mb-2">Klistra in länken till lagets följkalender (iCal):</p>
-              <input
-                type="url"
-                placeholder="https://sportadmin.se/cal/..."
-                className="w-full bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm placeholder:text-ice-muted/40"
-              />
-              <button className="mt-2 px-4 py-1.5 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
-                Spara
-              </button>
+          {sessions.length === 0 ? (
+            <p className="text-ice-muted/60 text-sm">Inga tider tillagda.</p>
+          ) : (
+            <div className="space-y-2">
+              {sessions.map(s => (
+                <div key={s.id} className={`rounded-lg p-3 text-sm border ${s.needs_goalie ? 'bg-goal-red/10 border-goal-red/30' : 'bg-rink-light border-rink-border'}`}>
+                  <p className="font-semibold text-white">{s.date} {s.time}</p>
+                  <p className="text-ice-muted">{s.type} @ {s.rink}</p>
+                  {s.needs_goalie && <p className="text-goal-red text-xs mt-1 font-semibold uppercase tracking-wider">Saknar målvakt</p>}
+                </div>
+              ))}
             </div>
-          </div>
+          )}
+
+          <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4 mt-8">Lägg till tid</h2>
+          <form onSubmit={handleCreateSession} className="bg-rink-light border border-rink-border rounded-lg p-4 space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <input name="date" type="date" required className="bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm" />
+              <input name="time" type="time" required className="bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <select name="type" className="bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm">
+                <option>Träning</option>
+                <option>Match</option>
+              </select>
+              <input name="rink" type="text" required placeholder="Hallnamn" className="bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm" />
+            </div>
+            <button type="submit"
+              className="w-full py-2 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
+              Lägg till
+            </button>
+          </form>
         </div>
       </div>
     </div>

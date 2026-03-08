@@ -56,6 +56,9 @@ export default function TeamDashboard() {
     const { data } = await supabase.from('teams').select('*').eq('user_id', user.id)
     if (data?.length > 0) {
       setTeam(data[0])
+    } else {
+      // Pre-fill contact email from auth user
+      setTeamForm(prev => ({ ...prev, contactEmail: user.email || '' }))
     }
     // Also load all teams for display
     const { data: allTeams } = await supabase.from('teams').select('*')
@@ -83,7 +86,8 @@ export default function TeamDashboard() {
     try {
       if (mode === 'register') {
         await signUp(email, password)
-        setMode('register-team')
+        setMode('check-email')
+        return
       } else {
         await signIn(email, password)
       }
@@ -146,6 +150,31 @@ export default function TeamDashboard() {
   }
 
   if (loading) return <p className="text-ice-muted">Laddar...</p>
+
+  // Check email confirmation screen
+  if (mode === 'check-email') {
+    return (
+      <div className="max-w-md mx-auto py-12 text-center">
+        <div className="w-16 h-16 bg-jersey-blue/20 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+          ✉
+        </div>
+        <h1 className="font-display text-3xl font-bold uppercase tracking-tight mb-4">Kolla din e-post</h1>
+        <p className="text-ice-muted mb-2 leading-relaxed">
+          Vi har skickat ett bekräftelsemejl till <span className="text-white font-semibold">{email}</span>.
+        </p>
+        <p className="text-ice-muted mb-8 leading-relaxed">
+          Klicka på länken i mejlet för att aktivera ditt konto. Kolla även skräpposten om du inte hittar det.
+        </p>
+        <div className="bg-rink-light border border-rink-border rounded-lg p-4 mb-6">
+          <p className="text-sm text-ice-muted/60">När du har bekräftat din e-post, kom tillbaka hit och logga in.</p>
+        </div>
+        <button onClick={() => setMode('login')}
+          className="px-6 py-2.5 bg-goal-red text-white rounded font-semibold text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer">
+          Jag har bekräftat — logga in
+        </button>
+      </div>
+    )
+  }
 
   // Not logged in — show login/register
   if (!user) {

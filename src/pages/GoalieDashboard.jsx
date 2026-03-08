@@ -45,7 +45,12 @@ export default function GoalieDashboard() {
 
   async function loadGoalie() {
     const { data } = await supabase.from('goalies').select('*').eq('user_id', user.id)
-    if (data?.length > 0) setGoalie(data[0])
+    if (data?.length > 0) {
+      setGoalie(data[0])
+    } else {
+      // Pre-fill email from auth user
+      setGoalieForm(prev => ({ ...prev, email: user.email || '' }))
+    }
   }
 
   async function loadRequests() {
@@ -67,7 +72,8 @@ export default function GoalieDashboard() {
     try {
       if (mode === 'register') {
         await signUp(email, password)
-        setMode('register-goalie')
+        setMode('check-email')
+        return
       } else {
         await signIn(email, password)
       }
@@ -121,6 +127,31 @@ export default function GoalieDashboard() {
   }
 
   if (loading) return <p className="text-ice-muted">Laddar...</p>
+
+  // Check email confirmation screen
+  if (mode === 'check-email') {
+    return (
+      <div className="max-w-md mx-auto py-12 text-center">
+        <div className="w-16 h-16 bg-jersey-blue/20 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+          ✉
+        </div>
+        <h1 className="font-display text-3xl font-bold uppercase tracking-tight mb-4">Kolla din e-post</h1>
+        <p className="text-ice-muted mb-2 leading-relaxed">
+          Vi har skickat ett bekräftelsemejl till <span className="text-white font-semibold">{email}</span>.
+        </p>
+        <p className="text-ice-muted mb-8 leading-relaxed">
+          Klicka på länken i mejlet för att aktivera ditt konto. Kolla även skräpposten om du inte hittar det.
+        </p>
+        <div className="bg-rink-light border border-rink-border rounded-lg p-4 mb-6">
+          <p className="text-sm text-ice-muted/60">När du har bekräftat din e-post, kom tillbaka hit och logga in.</p>
+        </div>
+        <button onClick={() => setMode('login')}
+          className="px-6 py-2.5 bg-goal-red text-white rounded font-semibold text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer">
+          Jag har bekräftat — logga in
+        </button>
+      </div>
+    )
+  }
 
   // Not logged in
   if (!user) {

@@ -12,6 +12,8 @@ export default function TeamDashboard() {
   const [favorites, setFavorites] = useState([])
   const [showNewRequest, setShowNewRequest] = useState(false)
   const [newRequest, setNewRequest] = useState({ sessionId: '', type: 'open' })
+  const [allGoalies, setAllGoalies] = useState([])
+  const [goalieSearch, setGoalieSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [mode, setMode] = useState('login')
@@ -43,6 +45,7 @@ export default function TeamDashboard() {
       loadSessions()
       loadRequests()
       loadFavorites()
+      loadAllGoalies()
     }
   }, [team])
 
@@ -78,6 +81,24 @@ export default function TeamDashboard() {
   async function loadFavorites() {
     const { data } = await supabase.from('favorites').select('*, goalies(*)').eq('team_id', team.id)
     setFavorites(data || [])
+  }
+
+  async function loadAllGoalies() {
+    const { data } = await supabase.from('goalies').select('id, name, location')
+    setAllGoalies(data || [])
+  }
+
+  async function addFavorite(goalieId) {
+    const { error: err } = await supabase.from('favorites').insert({ team_id: team.id, goalie_id: goalieId })
+    if (!err) {
+      setGoalieSearch('')
+      loadFavorites()
+    }
+  }
+
+  async function removeFavorite(favoriteId) {
+    await supabase.from('favorites').delete().eq('id', favoriteId)
+    loadFavorites()
   }
 
   async function handleAuth(e) {
@@ -366,13 +387,52 @@ export default function TeamDashboard() {
           ) : (
             <div className="space-y-2">
               {favorites.map(f => (
-                <div key={f.id} className="bg-rink-light border border-rink-border rounded-lg p-4">
-                  <p className="font-semibold text-white">{f.goalies?.name}</p>
-                  <p className="text-sm text-ice-muted">{f.goalies?.location}</p>
+                <div key={f.id} className="bg-rink-light border border-rink-border rounded-lg p-4 flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold text-white">{f.goalies?.name}</p>
+                    <p className="text-sm text-ice-muted">{f.goalies?.location}</p>
+                  </div>
+                  <button onClick={() => removeFavorite(f.id)}
+                    className="text-ice-muted/40 hover:text-goal-red text-xs uppercase tracking-wider bg-transparent border-none cursor-pointer transition-colors">
+                    Ta bort
+                  </button>
                 </div>
               ))}
             </div>
           )}
+
+          {/* Search and add goalie as favorite */}
+          <div className="mt-3">
+            <input
+              type="text"
+              value={goalieSearch}
+              onChange={e => setGoalieSearch(e.target.value)}
+              placeholder="Sök målvakt..."
+              className="w-full bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm"
+            />
+            {goalieSearch.length >= 2 && (() => {
+              const favoriteGoalieIds = favorites.map(f => f.goalie_id)
+              const filtered = allGoalies.filter(g =>
+                !favoriteGoalieIds.includes(g.id) &&
+                g.name.toLowerCase().includes(goalieSearch.toLowerCase())
+              )
+              if (filtered.length === 0) return <p className="text-ice-muted/40 text-xs mt-2">Inga träffar.</p>
+              return (
+                <div className="mt-2 space-y-1">
+                  {filtered.map(g => (
+                    <button key={g.id} onClick={() => addFavorite(g.id)}
+                      className="w-full text-left bg-rink-light border border-rink-border rounded px-3 py-2 text-sm hover:border-jersey-blue/60 transition-colors cursor-pointer flex items-center justify-between">
+                      <span>
+                        <span className="text-white font-semibold">{g.name}</span>
+                        <span className="text-ice-muted ml-2">{g.location}</span>
+                      </span>
+                      <span className="text-jersey-blue text-xs uppercase tracking-wider">+ Lägg till</span>
+                    </button>
+                  ))}
+                </div>
+              )
+            })()}
+          </div>
 
           <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4 mt-8">Kommande tider</h2>
           {sessions.length === 0 ? (

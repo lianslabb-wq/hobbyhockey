@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import About from './pages/About'
 import TeamDashboard from './pages/TeamDashboard'
 import GoalieDashboard from './pages/GoalieDashboard'
+import Admin from './pages/Admin'
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
         <Route path="/team" element={<TeamDashboard />} />
         <Route path="/goalie" element={<GoalieDashboard />} />
         <Route path="/about" element={<About />} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
     </Layout>
   )

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { signIn, signOut, getUser } from '../lib/auth'
 
-const ADMIN_EMAILS = ['lianslab@gmail.com']
+const ADMIN_EMAILS = ['lianslabb@gmail.com']
 
 export default function Admin() {
   const [user, setUser] = useState(null)

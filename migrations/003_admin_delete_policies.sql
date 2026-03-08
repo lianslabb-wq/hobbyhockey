@@ -1,4 +1,4 @@
--- Allow admin (lianslab@gmail.com) to delete any row
+-- Allow admin (lianslabb@gmail.com) to delete any row
 -- First get the admin user's ID dynamically via email lookup
 
 create or replace function public.is_admin()
@@ -6,7 +6,7 @@ returns boolean as $$
   select exists (
     select 1 from auth.users
     where id = auth.uid()
-    and email = 'lianslab@gmail.com'
+    and email = 'lianslabb@gmail.com'
   );
 $$ language sql security definer;
 

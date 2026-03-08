@@ -18,7 +18,7 @@ export default function GoalieDashboard() {
 
   // Goalie registration form
   const [goalieForm, setGoalieForm] = useState({
-    name: '', email: '', phone: '', location: '', region: 'Stockholm'
+    name: '', email: '', phone: '', location: '', region: 'Stockholm', address: ''
   })
 
   useEffect(() => {
@@ -92,6 +92,7 @@ export default function GoalieDashboard() {
         phone: goalieForm.phone || null,
         location: goalieForm.location,
         region: goalieForm.region,
+        address: goalieForm.address || null,
         available: true,
         user_id: user.id,
       }).select().single()
@@ -226,6 +227,12 @@ export default function GoalieDashboard() {
                 className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
             </div>
           </div>
+          <div>
+            <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Hemadress (valfritt)</label>
+            <input type="text" value={goalieForm.address} onChange={e => setGoalieForm({...goalieForm, address: e.target.value})} placeholder="T.ex. Storgatan 1, 171 45 Solna"
+              className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+            <p className="text-xs text-ice-muted/40 mt-1">Används för att visa avstånd till ishallar. Visas aldrig för andra.</p>
+          </div>
           <button type="submit"
             className="w-full py-2.5 bg-goal-green text-white rounded font-semibold text-sm uppercase tracking-wider hover:bg-goal-green/80 transition-colors cursor-pointer">
             Skapa profil
@@ -332,6 +339,12 @@ export default function GoalieDashboard() {
               <p className="text-xs text-ice-muted/60 uppercase tracking-wider">Plats</p>
               <p className="font-semibold text-white">{goalie.location}, {goalie.region}</p>
             </div>
+            {goalie.address && (
+              <div>
+                <p className="text-xs text-ice-muted/60 uppercase tracking-wider">Adress</p>
+                <p className="font-semibold text-white">{goalie.address}</p>
+              </div>
+            )}
             <div className="flex items-center gap-2 pt-1">
               <span className={`w-2.5 h-2.5 rounded-full ${goalie.available ? 'bg-goal-green' : 'bg-goal-red'}`} />
               <span className="text-sm font-medium">{goalie.available ? 'Tillgänglig' : 'Inte tillgänglig'}</span>

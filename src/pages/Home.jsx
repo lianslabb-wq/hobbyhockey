@@ -2,17 +2,25 @@ import { Link } from 'react-router-dom'
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center text-center py-12">
-      {/* Hero */}
-      <div className="mb-12">
-        <h1 className="font-display text-6xl sm:text-7xl font-bold uppercase tracking-tight mb-4">
-          Hitta en{' '}
-          <span className="text-goal-red">målvakt</span>
-        </h1>
-        <p className="text-ice-muted text-lg max-w-lg mx-auto leading-relaxed">
-          Saknar ditt lag en målvakt till nästa träning eller match?
-          Vi kopplar ihop veteranhockeylag med tillgängliga målvakter — snabbt och enkelt.
-        </p>
+    <div className="flex flex-col items-center py-12">
+      {/* Hero — text left, image right (image placeholder for now) */}
+      <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mb-16">
+        <div className="text-left">
+          <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold uppercase tracking-tight mb-6">
+            Hitta en{' '}
+            <span className="text-goal-red">målvakt</span>
+          </h1>
+          <p className="text-ice-muted text-lg max-w-lg leading-relaxed">
+            Saknar ditt lag en målvakt till nästa träning eller match?
+            Vi kopplar ihop veteranhockeylag med tillgängliga målvakter — snabbt och enkelt.
+          </p>
+        </div>
+        {/* Hero image — replace src with your generated image */}
+        <div className="hidden lg:flex items-center justify-end">
+          <div className="w-full h-80 rounded-lg bg-gradient-to-br from-rink-light via-rink to-puck flex items-center justify-center border border-rink-border">
+            <p className="text-ice-muted/30 font-display uppercase tracking-widest text-sm">Hero-bild kommer här</p>
+          </div>
+        </div>
       </div>
 
       {/* CTA cards */}
@@ -51,7 +59,7 @@ export default function Home() {
       </div>
 
       {/* How it works */}
-      <div className="w-full max-w-2xl">
+      <div className="w-full max-w-2xl text-center">
         <h3 className="font-display text-xl font-bold uppercase tracking-wider mb-8 text-ice-muted">
           Så här funkar det
         </h3>

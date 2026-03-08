@@ -126,6 +126,7 @@ export default function TeamDashboard() {
       time: form.time.value,
       type: form.type.value,
       rink: form.rink.value,
+      rink_address: form.rink_address.value || null,
       needs_goalie: true,
     })
     if (!err) {
@@ -382,6 +383,7 @@ export default function TeamDashboard() {
                 <div key={s.id} className={`rounded-lg p-3 text-sm border ${s.needs_goalie ? 'bg-goal-red/10 border-goal-red/30' : 'bg-rink-light border-rink-border'}`}>
                   <p className="font-semibold text-white">{s.date} {s.time}</p>
                   <p className="text-ice-muted">{s.type} @ {s.rink}</p>
+                  {s.rink_address && <p className="text-ice-muted/60 text-xs">{s.rink_address}</p>}
                   {s.needs_goalie && <p className="text-goal-red text-xs mt-1 font-semibold uppercase tracking-wider">Saknar målvakt</p>}
                 </div>
               ))}
@@ -401,6 +403,7 @@ export default function TeamDashboard() {
               </select>
               <input name="rink" type="text" required placeholder="Hallnamn" className="bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm" />
             </div>
+            <input name="rink_address" type="text" placeholder="Adress till ishallen (valfritt)" className="w-full bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm" />
             <button type="submit"
               className="w-full py-2 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
               Lägg till

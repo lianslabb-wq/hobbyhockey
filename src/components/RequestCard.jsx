@@ -43,6 +43,7 @@ export default function RequestCard({ request, session, team: teamProp, onRespon
         <div>
           <p className="text-ice-muted/60 mb-1 text-xs uppercase tracking-wider">Plats</p>
           <p className="font-semibold text-white">{session.rink}</p>
+          {session.rink_address && <p className="text-ice-muted/60 text-xs mt-0.5">{session.rink_address}</p>}
         </div>
       </div>
       <div className="flex items-center justify-between">

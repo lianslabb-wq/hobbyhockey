@@ -255,7 +255,7 @@ export default function TeamDashboard() {
               <select value={teamForm.type} onChange={e => setTeamForm({...teamForm, type: e.target.value})}
                 className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm">
                 <option>Veteran</option>
-                <option>Recreational</option>
+                <option>Korpen/Motion</option>
               </select>
             </div>
             <div>

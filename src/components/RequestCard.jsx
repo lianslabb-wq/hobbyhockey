@@ -31,7 +31,7 @@ export default function RequestCard({ request, session, team: teamProp, onRespon
           </span>
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-4 mb-4 text-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4 text-sm">
         <div>
           <p className="text-ice-muted/80 mb-1 text-xs uppercase tracking-wider">Datum</p>
           <p className="font-semibold text-white">{session.date}</p>

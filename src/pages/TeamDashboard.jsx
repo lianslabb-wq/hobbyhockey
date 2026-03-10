@@ -68,7 +68,8 @@ export default function TeamDashboard() {
   }
 
   async function loadSessions() {
-    const { data } = await supabase.from('sessions').select('*').eq('team_id', team.id).order('date')
+    const { data, error: err } = await supabase.from('sessions').select('*').eq('team_id', team.id).order('date')
+    if (err) { setError('Kunde inte ladda tider.'); return }
     setSessions(data || [])
   }
 
@@ -163,6 +164,7 @@ export default function TeamDashboard() {
 
   async function handleCreateSession(e) {
     e.preventDefault()
+    setError('')
     const form = e.target
     const { error: err } = await supabase.from('sessions').insert({
       team_id: team.id,
@@ -173,25 +175,24 @@ export default function TeamDashboard() {
       rink_address: form.rink_address.value || null,
       needs_goalie: true,
     })
-    if (!err) {
-      form.reset()
-      loadSessions()
-    }
+    if (err) { setError('Kunde inte lägga till tid. Försök igen.'); return }
+    form.reset()
+    loadSessions()
   }
 
   async function handleCreateRequest() {
     if (!newRequest.sessionId) return
+    setError('')
     const { error: err } = await supabase.from('requests').insert({
       team_id: team.id,
       session_id: newRequest.sessionId,
       type: newRequest.type,
       status: 'open',
     })
-    if (!err) {
-      setShowNewRequest(false)
-      setNewRequest({ sessionId: '', type: 'open' })
-      loadRequests()
-    }
+    if (err) { setError('Kunde inte skapa förfrågan. Försök igen.'); return }
+    setShowNewRequest(false)
+    setNewRequest({ sessionId: '', type: 'open' })
+    loadRequests()
   }
 
   if (loading) return <p className="text-ice-muted">Laddar...</p>
@@ -328,6 +329,7 @@ export default function TeamDashboard() {
 
   return (
     <div>
+      {error && <p className="text-goal-red mb-4 text-sm bg-goal-red/10 border border-goal-red/30 rounded-lg px-4 py-3">{error}</p>}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="font-display text-3xl font-bold uppercase tracking-tight">{team.name}</h1>

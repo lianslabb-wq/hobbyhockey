@@ -7,6 +7,7 @@ import GoalieDashboard from './pages/GoalieDashboard'
 import Admin from './pages/Admin'
 import Thanks from './pages/Thanks'
 import Privacy from './pages/Privacy'
+import NotFound from './pages/NotFound'
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
         <Route path="/admin" element={<Admin />} />
         <Route path="/tack" element={<Thanks />} />
         <Route path="/integritet" element={<Privacy />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Layout>
   )

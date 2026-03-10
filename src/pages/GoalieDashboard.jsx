@@ -107,22 +107,22 @@ export default function GoalieDashboard() {
   }
 
   async function handleRespond(requestId, answer) {
+    setError('')
     const { error: err } = await supabase.from('responses').insert({
       request_id: requestId,
       goalie_id: goalie.id,
       answer,
     })
-    if (!err) {
-      // If first "yes", mark request as filled
-      if (answer === 'yes') {
-        const req = requests.find(r => r.id === requestId)
-        const hasOtherYes = req?.responses?.some(r => r.answer === 'yes')
-        if (!hasOtherYes) {
-          await supabase.from('requests').update({ status: 'filled' }).eq('id', requestId)
-        }
+    if (err) { setError('Kunde inte skicka svar. Försök igen.'); return }
+    // If first "yes", mark request as filled
+    if (answer === 'yes') {
+      const req = requests.find(r => r.id === requestId)
+      const hasOtherYes = req?.responses?.some(r => r.answer === 'yes')
+      if (!hasOtherYes) {
+        await supabase.from('requests').update({ status: 'filled' }).eq('id', requestId)
       }
-      loadRequests()
     }
+    loadRequests()
   }
 
   async function toggleAvailable() {
@@ -261,6 +261,7 @@ export default function GoalieDashboard() {
 
   return (
     <div>
+      {error && <p className="text-goal-red mb-4 text-sm bg-goal-red/10 border border-goal-red/30 rounded-lg px-4 py-3">{error}</p>}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="font-display text-3xl font-bold uppercase tracking-tight">Hej, {goalie.name}!</h1>

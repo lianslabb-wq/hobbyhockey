@@ -71,7 +71,7 @@ export default function Home() {
         <h3 className="font-display text-xl font-bold uppercase tracking-wider mb-8 text-ice-muted">
           Så här funkar det
         </h3>
-        <div className="grid grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
           <div>
             <div className="font-display text-4xl font-bold text-goal-red mb-3">01</div>
             <p className="text-sm text-ice-muted leading-relaxed">

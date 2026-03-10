@@ -151,7 +151,7 @@ export default function Admin() {
               <div>
                 <p className="font-semibold text-white">{t.name}</p>
                 <p className="text-sm text-ice-muted">{t.type} &middot; {t.location} &middot; {t.contact_name} ({t.contact_email})</p>
-                <p className="text-xs text-ice-muted/60 mt-1 font-mono">ID: {t.id}</p>
+                <p className="text-xs text-ice-muted/80 mt-1 font-mono">ID: {t.id}</p>
               </div>
               <button onClick={() => deleteTeam(t.id)}
                 className="px-3 py-1.5 bg-goal-red/20 text-goal-red rounded text-xs font-semibold uppercase tracking-wider hover:bg-goal-red/40 transition-colors cursor-pointer">
@@ -159,7 +159,7 @@ export default function Admin() {
               </button>
             </div>
           ))}
-          {teams.length === 0 && <p className="text-ice-muted/60">Inga lag registrerade.</p>}
+          {teams.length === 0 && <p className="text-ice-muted/80">Inga lag registrerade.</p>}
         </div>
       )}
 
@@ -173,7 +173,7 @@ export default function Admin() {
                   <span className={`ml-2 inline-block w-2 h-2 rounded-full ${g.available ? 'bg-goal-green' : 'bg-ice-muted/40'}`} />
                 </p>
                 <p className="text-sm text-ice-muted">{g.location} &middot; {g.email} {g.phone && `&middot; ${g.phone}`}</p>
-                <p className="text-xs text-ice-muted/60 mt-1 font-mono">ID: {g.id}</p>
+                <p className="text-xs text-ice-muted/80 mt-1 font-mono">ID: {g.id}</p>
               </div>
               <button onClick={() => deleteGoalie(g.id)}
                 className="px-3 py-1.5 bg-goal-red/20 text-goal-red rounded text-xs font-semibold uppercase tracking-wider hover:bg-goal-red/40 transition-colors cursor-pointer">
@@ -181,7 +181,7 @@ export default function Admin() {
               </button>
             </div>
           ))}
-          {goalies.length === 0 && <p className="text-ice-muted/60">Inga målvakter registrerade.</p>}
+          {goalies.length === 0 && <p className="text-ice-muted/80">Inga målvakter registrerade.</p>}
         </div>
       )}
 
@@ -201,7 +201,7 @@ export default function Admin() {
                   {r.sessions?.date} {r.sessions?.time} @ {r.sessions?.rink}
                   {r.responses?.[0]?.count > 0 && ` — ${r.responses[0].count} svar`}
                 </p>
-                <p className="text-xs text-ice-muted/60 mt-1 font-mono">ID: {r.id}</p>
+                <p className="text-xs text-ice-muted/80 mt-1 font-mono">ID: {r.id}</p>
               </div>
               <button onClick={() => deleteRequest(r.id)}
                 className="px-3 py-1.5 bg-goal-red/20 text-goal-red rounded text-xs font-semibold uppercase tracking-wider hover:bg-goal-red/40 transition-colors cursor-pointer">
@@ -209,7 +209,7 @@ export default function Admin() {
               </button>
             </div>
           ))}
-          {requests.length === 0 && <p className="text-ice-muted/60">Inga förfrågningar.</p>}
+          {requests.length === 0 && <p className="text-ice-muted/80">Inga förfrågningar.</p>}
         </div>
       )}
     </div>

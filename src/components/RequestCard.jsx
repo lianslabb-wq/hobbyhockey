@@ -33,21 +33,21 @@ export default function RequestCard({ request, session, team: teamProp, onRespon
       </div>
       <div className="grid grid-cols-3 gap-4 mb-4 text-sm">
         <div>
-          <p className="text-ice-muted/60 mb-1 text-xs uppercase tracking-wider">Datum</p>
+          <p className="text-ice-muted/80 mb-1 text-xs uppercase tracking-wider">Datum</p>
           <p className="font-semibold text-white">{session.date}</p>
         </div>
         <div>
-          <p className="text-ice-muted/60 mb-1 text-xs uppercase tracking-wider">Tid</p>
+          <p className="text-ice-muted/80 mb-1 text-xs uppercase tracking-wider">Tid</p>
           <p className="font-semibold text-white">{session.time}</p>
         </div>
         <div>
-          <p className="text-ice-muted/60 mb-1 text-xs uppercase tracking-wider">Plats</p>
+          <p className="text-ice-muted/80 mb-1 text-xs uppercase tracking-wider">Plats</p>
           <p className="font-semibold text-white">{session.rink}</p>
-          {session.rink_address && <p className="text-ice-muted/60 text-xs mt-0.5">{session.rink_address}</p>}
+          {session.rink_address && <p className="text-ice-muted/80 text-xs mt-0.5">{session.rink_address}</p>}
         </div>
       </div>
       <div className="flex items-center justify-between">
-        <p className="text-xs text-ice-muted/40 uppercase tracking-wider">{session.type}</p>
+        <p className="text-xs text-ice-muted/70 uppercase tracking-wider">{session.type}</p>
         {isGoalieView && request.status === 'open' && (
           <div className="flex gap-2">
             <button
@@ -67,12 +67,12 @@ export default function RequestCard({ request, session, team: teamProp, onRespon
       </div>
       {request.responses?.length > 0 && (
         <div className="mt-4 pt-4 border-t border-rink-border">
-          <p className="text-xs text-ice-muted/60 mb-2 uppercase tracking-wider">Svar ({request.responses.length})</p>
+          <p className="text-xs text-ice-muted/80 mb-2 uppercase tracking-wider">Svar ({request.responses.length})</p>
           {request.responses.map((r, i) => (
             <div key={i} className="flex items-center gap-2 text-sm">
               <span className={`w-2 h-2 rounded-full ${r.answer === 'yes' ? 'bg-goal-green' : 'bg-goal-red'}`} />
               <span className="text-white">{r.goalieName}</span>
-              <span className="text-ice-muted/40">{r.answer === 'yes' ? 'Tillgänglig' : 'Kan inte'}</span>
+              <span className="text-ice-muted/70">{r.answer === 'yes' ? 'Tillgänglig' : 'Kan inte'}</span>
             </div>
           ))}
         </div>

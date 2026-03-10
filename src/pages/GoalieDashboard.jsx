@@ -144,7 +144,7 @@ export default function GoalieDashboard() {
           Klicka på länken i mejlet för att aktivera ditt konto. Kolla även skräpposten om du inte hittar det.
         </p>
         <div className="bg-rink-light border border-rink-border rounded-lg p-4 mb-6">
-          <p className="text-sm text-ice-muted/60">När du har bekräftat din e-post, kom tillbaka hit och logga in.</p>
+          <p className="text-sm text-ice-muted/80">När du har bekräftat din e-post, kom tillbaka hit och logga in.</p>
         </div>
         <button onClick={() => setMode('login')}
           className="px-6 py-2.5 bg-goal-red text-white rounded font-semibold text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer">
@@ -167,12 +167,12 @@ export default function GoalieDashboard() {
         {error && <p className="text-goal-red mb-4 text-sm">{error}</p>}
         <form onSubmit={handleAuth} className="bg-rink-light border border-rink-border rounded-lg p-6 space-y-4">
           <div>
-            <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">E-post</label>
+            <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">E-post</label>
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
               className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
           </div>
           <div>
-            <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Lösenord</label>
+            <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Lösenord</label>
             <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
               className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
           </div>
@@ -180,7 +180,7 @@ export default function GoalieDashboard() {
             className="w-full py-2.5 bg-goal-red text-white rounded font-semibold text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer">
             {mode === 'login' ? 'Logga in' : 'Skapa konto'}
           </button>
-          <p className="text-center text-sm text-ice-muted/60">
+          <p className="text-center text-sm text-ice-muted/80">
             {mode === 'login' ? (
               <>Inget konto? <button type="button" onClick={() => setMode('register')} className="text-jersey-blue hover:text-jersey-blue-light bg-transparent border-none cursor-pointer">Registrera dig</button></>
             ) : (
@@ -201,40 +201,40 @@ export default function GoalieDashboard() {
         {error && <p className="text-goal-red mb-4 text-sm">{error}</p>}
         <form onSubmit={handleRegisterGoalie} className="bg-rink-light border border-rink-border rounded-lg p-6 space-y-4">
           <div>
-            <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Namn</label>
+            <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Namn</label>
             <input type="text" value={goalieForm.name} onChange={e => setGoalieForm({...goalieForm, name: e.target.value})} required placeholder="T.ex. Rikard"
               className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
           </div>
           <div>
-            <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">E-post</label>
+            <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">E-post</label>
             <input type="email" value={goalieForm.email} onChange={e => setGoalieForm({...goalieForm, email: e.target.value})} required
               className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
           </div>
           <div>
-            <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Telefon</label>
+            <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Telefon</label>
             <input type="tel" value={goalieForm.phone} onChange={e => setGoalieForm({...goalieForm, phone: e.target.value})} placeholder="070-123 45 67"
               className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Ort</label>
+              <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Ort</label>
               <input type="text" value={goalieForm.location} onChange={e => setGoalieForm({...goalieForm, location: e.target.value})} required placeholder="T.ex. Solna"
                 className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
             </div>
             <div>
-              <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Region</label>
+              <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Region</label>
               <input type="text" value={goalieForm.region} onChange={e => setGoalieForm({...goalieForm, region: e.target.value})} required
                 className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
             </div>
           </div>
           <div>
-            <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Hemadress (valfritt)</label>
+            <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Hemadress (valfritt)</label>
             <input type="text" value={goalieForm.address} onChange={e => setGoalieForm({...goalieForm, address: e.target.value})} placeholder="T.ex. Storgatan 1, 171 45 Solna"
               className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
-            <p className="text-xs text-ice-muted/40 mt-1">Används för att visa avstånd till ishallar. Visas aldrig för andra.</p>
+            <p className="text-xs text-ice-muted mt-1.5">Används för att visa avstånd till ishallar. Visas aldrig för andra.</p>
           </div>
           <button type="submit"
-            className="w-full py-2.5 bg-goal-green text-white rounded font-semibold text-sm uppercase tracking-wider hover:bg-goal-green/80 transition-colors cursor-pointer">
+            className="w-full py-2.5 bg-goal-red text-white rounded font-semibold text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer">
             Skapa profil
           </button>
         </form>
@@ -269,7 +269,7 @@ export default function GoalieDashboard() {
         <div className="lg:col-span-2">
           <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Öppna förfrågningar</h2>
           {openRequests.length === 0 ? (
-            <p className="text-ice-muted/60">Inga lag söker målvakt just nu.</p>
+            <p className="text-ice-muted/80">Inga lag söker målvakt just nu.</p>
           ) : (
             <div className="space-y-4">
               {openRequests.map(req => {
@@ -322,26 +322,26 @@ export default function GoalieDashboard() {
           <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Min profil</h2>
           <div className="bg-rink-light border border-rink-border rounded-lg p-5 space-y-3">
             <div>
-              <p className="text-xs text-ice-muted/60 uppercase tracking-wider">Namn</p>
+              <p className="text-xs text-ice-muted/80 uppercase tracking-wider">Namn</p>
               <p className="font-semibold text-white">{goalie.name}</p>
             </div>
             <div>
-              <p className="text-xs text-ice-muted/60 uppercase tracking-wider">E-post</p>
+              <p className="text-xs text-ice-muted/80 uppercase tracking-wider">E-post</p>
               <p className="font-semibold text-white">{goalie.email}</p>
             </div>
             {goalie.phone && (
               <div>
-                <p className="text-xs text-ice-muted/60 uppercase tracking-wider">Telefon</p>
+                <p className="text-xs text-ice-muted/80 uppercase tracking-wider">Telefon</p>
                 <p className="font-semibold text-white">{goalie.phone}</p>
               </div>
             )}
             <div>
-              <p className="text-xs text-ice-muted/60 uppercase tracking-wider">Plats</p>
+              <p className="text-xs text-ice-muted/80 uppercase tracking-wider">Plats</p>
               <p className="font-semibold text-white">{goalie.location}, {goalie.region}</p>
             </div>
             {goalie.address && (
               <div>
-                <p className="text-xs text-ice-muted/60 uppercase tracking-wider">Adress</p>
+                <p className="text-xs text-ice-muted/80 uppercase tracking-wider">Adress</p>
                 <p className="font-semibold text-white">{goalie.address}</p>
               </div>
             )}

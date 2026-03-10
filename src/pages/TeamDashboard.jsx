@@ -60,8 +60,8 @@ export default function TeamDashboard() {
     if (data?.length > 0) {
       setTeam(data[0])
     } else {
-      // Pre-fill contact email from auth user
-      setTeamForm(prev => ({ ...prev, contactEmail: user.email || '' }))
+      // Don't pre-fill contact email — let each team fill in their own
+      setTeamForm(prev => prev)
     }
     // Also load all teams for display
     const { data: allTeams } = await supabase.from('teams').select('*')
@@ -188,7 +188,7 @@ export default function TeamDashboard() {
           Klicka på länken i mejlet för att aktivera ditt konto. Kolla även skräpposten om du inte hittar det.
         </p>
         <div className="bg-rink-light border border-rink-border rounded-lg p-4 mb-6">
-          <p className="text-sm text-ice-muted/60">När du har bekräftat din e-post, kom tillbaka hit och logga in.</p>
+          <p className="text-sm text-ice-muted/80">När du har bekräftat din e-post, kom tillbaka hit och logga in.</p>
         </div>
         <button onClick={() => setMode('login')}
           className="px-6 py-2.5 bg-goal-red text-white rounded font-semibold text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer">
@@ -211,12 +211,12 @@ export default function TeamDashboard() {
         {error && <p className="text-goal-red mb-4 text-sm">{error}</p>}
         <form onSubmit={handleAuth} className="bg-rink-light border border-rink-border rounded-lg p-6 space-y-4">
           <div>
-            <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">E-post</label>
+            <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">E-post</label>
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
               className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
           </div>
           <div>
-            <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Lösenord</label>
+            <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Lösenord</label>
             <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
               className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
           </div>
@@ -224,7 +224,7 @@ export default function TeamDashboard() {
             className="w-full py-2.5 bg-goal-red text-white rounded font-semibold text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer">
             {mode === 'login' ? 'Logga in' : 'Skapa konto'}
           </button>
-          <p className="text-center text-sm text-ice-muted/60">
+          <p className="text-center text-sm text-ice-muted/80">
             {mode === 'login' ? (
               <>Inget konto? <button type="button" onClick={() => setMode('register')} className="text-jersey-blue hover:text-jersey-blue-light bg-transparent border-none cursor-pointer">Registrera dig</button></>
             ) : (
@@ -245,13 +245,13 @@ export default function TeamDashboard() {
         {error && <p className="text-goal-red mb-4 text-sm">{error}</p>}
         <form onSubmit={handleRegisterTeam} className="bg-rink-light border border-rink-border rounded-lg p-6 space-y-4">
           <div>
-            <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Lagnamn</label>
+            <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Lagnamn</label>
             <input type="text" value={teamForm.name} onChange={e => setTeamForm({...teamForm, name: e.target.value})} required placeholder="T.ex. Solna Hockey"
               className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Typ</label>
+              <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Typ</label>
               <select value={teamForm.type} onChange={e => setTeamForm({...teamForm, type: e.target.value})}
                 className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm">
                 <option>Veteran</option>
@@ -259,25 +259,25 @@ export default function TeamDashboard() {
               </select>
             </div>
             <div>
-              <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Ort</label>
+              <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Ort</label>
               <input type="text" value={teamForm.location} onChange={e => setTeamForm({...teamForm, location: e.target.value})} required placeholder="T.ex. Solna"
                 className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Kontaktperson</label>
+              <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Kontaktperson</label>
               <input type="text" value={teamForm.contactName} onChange={e => setTeamForm({...teamForm, contactName: e.target.value})} required placeholder="T.ex. Robban"
                 className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
             </div>
             <div>
-              <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Kontakt e-post</label>
+              <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Kontakt e-post</label>
               <input type="email" value={teamForm.contactEmail} onChange={e => setTeamForm({...teamForm, contactEmail: e.target.value})} required
                 className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
             </div>
           </div>
           <div>
-            <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Följkalender-URL (valfritt)</label>
+            <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Följkalender-URL (valfritt)</label>
             <input type="url" value={teamForm.calendarUrl} onChange={e => setTeamForm({...teamForm, calendarUrl: e.target.value})} placeholder="https://sportadmin.se/cal/..."
               className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
           </div>
@@ -321,7 +321,7 @@ export default function TeamDashboard() {
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Tillfälle</label>
+                  <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Tillfälle</label>
                   <select value={newRequest.sessionId} onChange={e => setNewRequest({...newRequest, sessionId: e.target.value})}
                     className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm">
                     <option value="">Välj tillfälle...</option>
@@ -331,7 +331,7 @@ export default function TeamDashboard() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs text-ice-muted/60 mb-1.5 uppercase tracking-wider">Skicka till</label>
+                  <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Skicka till</label>
                   <select value={newRequest.type} onChange={e => setNewRequest({...newRequest, type: e.target.value})}
                     className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm">
                     <option value="favorites">Mina favoriter ({favorites.length} st)</option>
@@ -358,7 +358,7 @@ export default function TeamDashboard() {
         <div className="lg:col-span-2">
           <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Förfrågningar</h2>
           {requests.length === 0 ? (
-            <p className="text-ice-muted/60">Inga aktiva förfrågningar.</p>
+            <p className="text-ice-muted/80">Inga aktiva förfrågningar.</p>
           ) : (
             <div className="space-y-4">
               {requests.map(req => {
@@ -383,7 +383,7 @@ export default function TeamDashboard() {
         <div>
           <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Favoritmålvakter</h2>
           {favorites.length === 0 ? (
-            <p className="text-ice-muted/60 text-sm">Inga favoriter tillagda än.</p>
+            <p className="text-ice-muted/80 text-sm">Inga favoriter tillagda än.</p>
           ) : (
             <div className="space-y-2">
               {favorites.map(f => (
@@ -393,7 +393,7 @@ export default function TeamDashboard() {
                     <p className="text-sm text-ice-muted">{f.goalies?.location}</p>
                   </div>
                   <button onClick={() => removeFavorite(f.id)}
-                    className="text-ice-muted/40 hover:text-goal-red text-xs uppercase tracking-wider bg-transparent border-none cursor-pointer transition-colors">
+                    className="text-ice-muted/70 hover:text-goal-red text-xs uppercase tracking-wider bg-transparent border-none cursor-pointer transition-colors">
                     Ta bort
                   </button>
                 </div>
@@ -416,7 +416,7 @@ export default function TeamDashboard() {
                 !favoriteGoalieIds.includes(g.id) &&
                 g.name.toLowerCase().includes(goalieSearch.toLowerCase())
               )
-              if (filtered.length === 0) return <p className="text-ice-muted/40 text-xs mt-2">Inga träffar.</p>
+              if (filtered.length === 0) return <p className="text-ice-muted/70 text-xs mt-2">Inga träffar.</p>
               return (
                 <div className="mt-2 space-y-1">
                   {filtered.map(g => (
@@ -436,14 +436,14 @@ export default function TeamDashboard() {
 
           <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4 mt-8">Kommande tider</h2>
           {sessions.length === 0 ? (
-            <p className="text-ice-muted/60 text-sm">Inga tider tillagda.</p>
+            <p className="text-ice-muted/80 text-sm">Inga tider tillagda.</p>
           ) : (
             <div className="space-y-2">
               {sessions.map(s => (
                 <div key={s.id} className={`rounded-lg p-3 text-sm border ${s.needs_goalie ? 'bg-goal-red/10 border-goal-red/30' : 'bg-rink-light border-rink-border'}`}>
                   <p className="font-semibold text-white">{s.date} {s.time}</p>
                   <p className="text-ice-muted">{s.type} @ {s.rink}</p>
-                  {s.rink_address && <p className="text-ice-muted/60 text-xs">{s.rink_address}</p>}
+                  {s.rink_address && <p className="text-ice-muted/80 text-xs">{s.rink_address}</p>}
                   {s.needs_goalie && <p className="text-goal-red text-xs mt-1 font-semibold uppercase tracking-wider">Saknar målvakt</p>}
                 </div>
               ))}

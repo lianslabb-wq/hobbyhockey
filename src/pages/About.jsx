@@ -44,18 +44,18 @@ export default function About() {
           <p className="mb-2">
             Har du frågor, feedback eller vill testa med ditt lag?
           </p>
-          <a href="mailto:lianslab@gmail.com" className="text-jersey-blue hover:text-jersey-blue-light transition-colors">
-            lianslab@gmail.com
+          <a href="mailto:lianslabb@gmail.com" className="text-jersey-blue hover:text-jersey-blue-light transition-colors">
+            lianslabb@gmail.com
           </a>
         </section>
 
         <section className="text-center pt-6 border-t border-rink-border">
-          <p className="text-ice-muted/60 text-sm mb-3 uppercase tracking-wider">Gillar du vad vi bygger?</p>
+          <p className="text-ice-muted text-sm mb-4 font-semibold uppercase tracking-wider">Gillar du vad vi bygger?</p>
           <a
             href="https://ko-fi.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block px-6 py-3 bg-stick-gold text-puck font-semibold rounded text-sm uppercase tracking-wider hover:bg-stick-gold/80 transition-colors no-underline"
+            className="inline-block px-6 py-3 bg-rink-lighter border border-rink-border text-white font-semibold rounded text-sm uppercase tracking-wider hover:border-goal-red/60 hover:text-goal-red-light transition-colors no-underline"
           >
             Stöd oss med en kaffe
           </a>

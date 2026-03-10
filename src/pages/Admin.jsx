@@ -15,6 +15,7 @@ export default function Admin() {
   const [teams, setTeams] = useState([])
   const [goalies, setGoalies] = useState([])
   const [requests, setRequests] = useState([])
+  const [supportClicks, setSupportClicks] = useState(0)
 
   useEffect(() => {
     checkUser()
@@ -45,14 +46,16 @@ export default function Admin() {
   }
 
   async function loadAll() {
-    const [t, g, r] = await Promise.all([
+    const [t, g, r, s] = await Promise.all([
       supabase.from('teams').select('*').order('created_at', { ascending: false }),
       supabase.from('goalies').select('*').order('created_at', { ascending: false }),
       supabase.from('requests').select('*, teams(name), sessions(date, time, rink), responses(count)').order('created_at', { ascending: false }),
+      supabase.from('support_clicks').select('*', { count: 'exact', head: true }),
     ])
     setTeams(t.data || [])
     setGoalies(g.data || [])
     setRequests(r.data || [])
+    setSupportClicks(s.count || 0)
   }
 
   async function deleteTeam(id) {
@@ -120,6 +123,12 @@ export default function Admin() {
         <div>
           <h1 className="font-display text-3xl font-bold uppercase tracking-tight">Admin</h1>
           <p className="text-ice-muted text-sm">{user.email}</p>
+          {supportClicks > 0 && (
+            <p className="text-sm mt-1">
+              <span className="text-goal-red font-semibold">{supportClicks}</span>
+              <span className="text-ice-muted"> klick på &quot;Stöd oss med en kaffe&quot;</span>
+            </p>
+          )}
         </div>
         <div className="flex gap-2">
           <button onClick={loadAll}

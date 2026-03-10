@@ -1,4 +1,15 @@
+import { useNavigate } from 'react-router-dom'
+import { supabase } from '../lib/supabase'
+
 export default function About() {
+  const navigate = useNavigate()
+
+  async function handleSupportClick(e) {
+    e.preventDefault()
+    await supabase.from('support_clicks').insert({})
+    navigate('/tack')
+  }
+
   return (
     <div className="max-w-2xl mx-auto py-8">
       <h1 className="font-display text-4xl font-bold uppercase tracking-tight mb-8">Om Hobbyhockey</h1>
@@ -51,14 +62,12 @@ export default function About() {
 
         <section className="text-center pt-6 border-t border-rink-border">
           <p className="text-ice-muted text-sm mb-4 font-semibold uppercase tracking-wider">Gillar du vad vi bygger?</p>
-          <a
-            href="https://ko-fi.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block px-6 py-3 bg-goal-red text-white font-semibold rounded text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors no-underline"
+          <button
+            onClick={handleSupportClick}
+            className="px-6 py-3 bg-goal-red text-white font-semibold rounded text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer"
           >
             Stöd oss med en kaffe
-          </a>
+          </button>
         </section>
       </div>
     </div>

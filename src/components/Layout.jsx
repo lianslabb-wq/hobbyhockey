@@ -22,7 +22,7 @@ export default function Layout({ children }) {
               <h1 className="font-display text-xl font-bold text-white uppercase tracking-wide leading-tight">
                 Hobbyhockey
               </h1>
-              <p className="text-[10px] text-ice-muted uppercase tracking-[0.2em] leading-tight">
+              <p className="text-[10px] text-ice-muted font-semibold uppercase tracking-[0.2em] leading-tight">
                 Hitta en målvakt
               </p>
             </div>
@@ -48,7 +48,7 @@ export default function Layout({ children }) {
         {children}
       </main>
       <footer className="border-t border-rink-border py-6 text-center">
-        <p className="text-xs text-ice-muted/60 uppercase tracking-widest">Hobbyhockey</p>
+        <p className="text-xs text-ice-muted/80 font-semibold uppercase tracking-widest">Hobbyhockey</p>
       </footer>
     </div>
   )

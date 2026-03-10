@@ -22,6 +22,8 @@ export default function TeamDashboard() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
+  const [consent, setConsent] = useState(false)
+
   // Team registration form state
   const [teamForm, setTeamForm] = useState({
     name: '', type: 'Veteran', location: '', region: '',
@@ -63,9 +65,6 @@ export default function TeamDashboard() {
       // Don't pre-fill contact email — let each team fill in their own
       setTeamForm(prev => prev)
     }
-    // Also load all teams for display
-    const { data: allTeams } = await supabase.from('teams').select('*')
-    setTeams(allTeams || [])
   }
 
   async function loadSessions() {
@@ -74,17 +73,39 @@ export default function TeamDashboard() {
   }
 
   async function loadRequests() {
-    const { data } = await supabase.from('requests').select('*, responses(*, goalies(*))').eq('team_id', team.id).order('created_at', { ascending: false })
-    setRequests(data || [])
+    const { data } = await supabase.from('requests').select('*, responses(*)').eq('team_id', team.id).order('created_at', { ascending: false })
+    // Get goalie names from safe directory
+    const goalieIds = [...new Set((data || []).flatMap(r =>
+      (r.responses || []).map(resp => resp.goalie_id)
+    ).filter(Boolean))]
+    let goalieNames = {}
+    if (goalieIds.length > 0) {
+      const { data: gd } = await supabase.from('goalie_directory').select('id, name').in('id', goalieIds)
+      goalieNames = Object.fromEntries((gd || []).map(g => [g.id, g.name]))
+    }
+    // Attach safe goalie names to responses
+    setRequests((data || []).map(req => ({
+      ...req,
+      responses: (req.responses || []).map(r => ({
+        ...r,
+        goalies: { name: goalieNames[r.goalie_id] || 'Okänd' }
+      }))
+    })))
   }
 
   async function loadFavorites() {
-    const { data } = await supabase.from('favorites').select('*, goalies(*)').eq('team_id', team.id)
-    setFavorites(data || [])
+    const { data: favData } = await supabase.from('favorites').select('id, goalie_id').eq('team_id', team.id)
+    if (!favData?.length) { setFavorites([]); return }
+    const goalieIds = favData.map(f => f.goalie_id)
+    const { data: goalieData } = await supabase.from('goalie_directory').select('*').in('id', goalieIds)
+    setFavorites(favData.map(f => ({
+      ...f,
+      goalies: goalieData?.find(g => g.id === f.goalie_id) || null
+    })))
   }
 
   async function loadAllGoalies() {
-    const { data } = await supabase.from('goalies').select('id, name, location')
+    const { data } = await supabase.from('goalie_directory').select('*')
     setAllGoalies(data || [])
   }
 
@@ -130,6 +151,8 @@ export default function TeamDashboard() {
         contact_email: teamForm.contactEmail,
         calendar_url: teamForm.calendarUrl || null,
         user_id: user.id,
+        privacy_consent: true,
+        privacy_consent_at: new Date().toISOString(),
       }).select().single()
       if (err) throw err
       setTeam(data)
@@ -281,8 +304,18 @@ export default function TeamDashboard() {
             <input type="url" value={teamForm.calendarUrl} onChange={e => setTeamForm({...teamForm, calendarUrl: e.target.value})} placeholder="https://sportadmin.se/cal/..."
               className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
           </div>
-          <button type="submit"
-            className="w-full py-2.5 bg-goal-red text-white rounded font-semibold text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer">
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)}
+              className="mt-1 w-4 h-4 rounded border-rink-border accent-goal-red cursor-pointer" />
+            <span className="text-sm text-ice-muted">
+              Jag har läst och godkänner{' '}
+              <a href="/integritet" target="_blank" className="text-jersey-blue hover:text-jersey-blue-light">integritetspolicyn</a>.
+            </span>
+          </label>
+          <button type="submit" disabled={!consent}
+            className={`w-full py-2.5 rounded font-semibold text-sm uppercase tracking-wider transition-colors cursor-pointer ${
+              consent ? 'bg-goal-red text-white hover:bg-goal-red-light' : 'bg-rink-lighter text-ice-muted/70 cursor-not-allowed'
+            }`}>
             Registrera lag
           </button>
         </form>

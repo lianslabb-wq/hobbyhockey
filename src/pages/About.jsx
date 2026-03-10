@@ -1,12 +1,16 @@
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { getUser } from '../lib/auth'
 
 export default function About() {
   const navigate = useNavigate()
 
   async function handleSupportClick(e) {
     e.preventDefault()
-    await supabase.from('support_clicks').insert({})
+    const user = await getUser()
+    await supabase.from('support_clicks').insert({
+      user_email: user?.email || null,
+    })
     navigate('/tack')
   }
 

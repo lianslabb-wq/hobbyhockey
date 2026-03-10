@@ -15,7 +15,8 @@ export default function Admin() {
   const [teams, setTeams] = useState([])
   const [goalies, setGoalies] = useState([])
   const [requests, setRequests] = useState([])
-  const [supportClicks, setSupportClicks] = useState(0)
+  const [supportClicks, setSupportClicks] = useState([])
+  const [supportCount, setSupportCount] = useState(0)
 
   useEffect(() => {
     checkUser()
@@ -50,12 +51,13 @@ export default function Admin() {
       supabase.from('teams').select('*').order('created_at', { ascending: false }),
       supabase.from('goalies').select('*').order('created_at', { ascending: false }),
       supabase.from('requests').select('*, teams(name), sessions(date, time, rink), responses(count)').order('created_at', { ascending: false }),
-      supabase.from('support_clicks').select('*', { count: 'exact', head: true }),
+      supabase.from('support_clicks').select('*').order('created_at', { ascending: false }),
     ])
     setTeams(t.data || [])
     setGoalies(g.data || [])
     setRequests(r.data || [])
-    setSupportClicks(s.count || 0)
+    setSupportClicks(s.data || [])
+    setSupportCount(s.data?.length || 0)
   }
 
   async function deleteTeam(id) {
@@ -115,6 +117,7 @@ export default function Admin() {
     { key: 'teams', label: `Lag (${teams.length})` },
     { key: 'goalies', label: `Målvakter (${goalies.length})` },
     { key: 'requests', label: `Förfrågningar (${requests.length})` },
+    { key: 'support', label: `Stöd (${supportCount})` },
   ]
 
   return (
@@ -123,12 +126,6 @@ export default function Admin() {
         <div>
           <h1 className="font-display text-3xl font-bold uppercase tracking-tight">Admin</h1>
           <p className="text-ice-muted text-sm">{user.email}</p>
-          {supportClicks > 0 && (
-            <p className="text-sm mt-1">
-              <span className="text-goal-red font-semibold">{supportClicks}</span>
-              <span className="text-ice-muted"> klick på &quot;Stöd oss med en kaffe&quot;</span>
-            </p>
-          )}
         </div>
         <div className="flex gap-2">
           <button onClick={loadAll}
@@ -181,7 +178,7 @@ export default function Admin() {
                   {g.name}
                   <span className={`ml-2 inline-block w-2 h-2 rounded-full ${g.available ? 'bg-goal-green' : 'bg-ice-muted/40'}`} />
                 </p>
-                <p className="text-sm text-ice-muted">{g.location} &middot; {g.email} {g.phone && `&middot; ${g.phone}`}</p>
+                <p className="text-sm text-ice-muted">{g.location} · {g.email}{g.phone && <> · {g.phone}</>}</p>
                 <p className="text-xs text-ice-muted/80 mt-1 font-mono">ID: {g.id}</p>
               </div>
               <button onClick={() => deleteGoalie(g.id)}
@@ -219,6 +216,22 @@ export default function Admin() {
             </div>
           ))}
           {requests.length === 0 && <p className="text-ice-muted/80">Inga förfrågningar.</p>}
+        </div>
+      )}
+
+      {tab === 'support' && (
+        <div className="space-y-3">
+          <div className="bg-rink-light border border-rink-border rounded-lg p-5 mb-4">
+            <p className="text-white font-semibold text-lg">{supportCount} klick</p>
+            <p className="text-ice-muted text-sm">på "Stöd oss med en kaffe"</p>
+          </div>
+          {supportClicks.map(s => (
+            <div key={s.id} className="bg-rink-light border border-rink-border rounded-lg p-4">
+              <p className="text-white font-semibold">{s.user_email || 'Anonym besökare'}</p>
+              <p className="text-xs text-ice-muted/80">{new Date(s.created_at).toLocaleString('sv-SE')}</p>
+            </div>
+          ))}
+          {supportClicks.length === 0 && <p className="text-ice-muted/80">Inga klick ännu.</p>}
         </div>
       )}
     </div>

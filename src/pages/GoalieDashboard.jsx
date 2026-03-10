@@ -16,6 +16,8 @@ export default function GoalieDashboard() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
+  const [consent, setConsent] = useState(false)
+
   // Goalie registration form
   const [goalieForm, setGoalieForm] = useState({
     name: '', email: '', phone: '', location: '', region: '', address: ''
@@ -94,6 +96,8 @@ export default function GoalieDashboard() {
         address: goalieForm.address || null,
         available: true,
         user_id: user.id,
+        privacy_consent: true,
+        privacy_consent_at: new Date().toISOString(),
       }).select().single()
       if (err) throw err
       setGoalie(data)
@@ -232,8 +236,18 @@ export default function GoalieDashboard() {
               className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
             <p className="text-xs text-ice-muted mt-1.5">Används för att visa avstånd till ishallar. Visas aldrig för andra.</p>
           </div>
-          <button type="submit"
-            className="w-full py-2.5 bg-goal-red text-white rounded font-semibold text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer">
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)}
+              className="mt-1 w-4 h-4 rounded border-rink-border accent-goal-red cursor-pointer" />
+            <span className="text-sm text-ice-muted">
+              Jag har läst och godkänner{' '}
+              <a href="/integritet" target="_blank" className="text-jersey-blue hover:text-jersey-blue-light">integritetspolicyn</a>.
+            </span>
+          </label>
+          <button type="submit" disabled={!consent}
+            className={`w-full py-2.5 rounded font-semibold text-sm uppercase tracking-wider transition-colors cursor-pointer ${
+              consent ? 'bg-goal-red text-white hover:bg-goal-red-light' : 'bg-rink-lighter text-ice-muted/70 cursor-not-allowed'
+            }`}>
             Skapa profil
           </button>
         </form>

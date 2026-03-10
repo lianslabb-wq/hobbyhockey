@@ -55,7 +55,7 @@ export default function About() {
             href="https://ko-fi.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block px-6 py-3 bg-rink-lighter text-white font-semibold rounded border border-rink-border text-sm uppercase tracking-wider hover:border-ice-muted/40 transition-colors no-underline"
+            className="inline-block px-6 py-3 bg-goal-red text-white font-semibold rounded text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors no-underline"
           >
             Stöd oss med en kaffe
           </a>

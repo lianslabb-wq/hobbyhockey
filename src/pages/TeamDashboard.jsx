@@ -24,7 +24,7 @@ export default function TeamDashboard() {
 
   // Team registration form state
   const [teamForm, setTeamForm] = useState({
-    name: '', type: 'Veteran', location: '', region: 'Stockholm',
+    name: '', type: 'Veteran', location: '', region: '',
     contactName: '', contactEmail: '', calendarUrl: ''
   })
 
@@ -272,7 +272,7 @@ export default function TeamDashboard() {
             </div>
             <div>
               <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Kontakt e-post</label>
-              <input type="email" value={teamForm.contactEmail} onChange={e => setTeamForm({...teamForm, contactEmail: e.target.value})} required
+              <input type="email" value={teamForm.contactEmail} onChange={e => setTeamForm({...teamForm, contactEmail: e.target.value})} required placeholder="T.ex. namn@exempel.se"
                 className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
             </div>
           </div>

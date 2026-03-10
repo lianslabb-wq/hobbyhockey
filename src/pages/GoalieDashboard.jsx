@@ -18,7 +18,7 @@ export default function GoalieDashboard() {
 
   // Goalie registration form
   const [goalieForm, setGoalieForm] = useState({
-    name: '', email: '', phone: '', location: '', region: 'Stockholm', address: ''
+    name: '', email: '', phone: '', location: '', region: '', address: ''
   })
 
   useEffect(() => {
@@ -48,8 +48,7 @@ export default function GoalieDashboard() {
     if (data?.length > 0) {
       setGoalie(data[0])
     } else {
-      // Pre-fill email from auth user
-      setGoalieForm(prev => ({ ...prev, email: user.email || '' }))
+      // Don't pre-fill — let goalie enter their own details
     }
   }
 
@@ -207,7 +206,7 @@ export default function GoalieDashboard() {
           </div>
           <div>
             <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">E-post</label>
-            <input type="email" value={goalieForm.email} onChange={e => setGoalieForm({...goalieForm, email: e.target.value})} required
+            <input type="email" value={goalieForm.email} onChange={e => setGoalieForm({...goalieForm, email: e.target.value})} required placeholder="T.ex. namn@exempel.se"
               className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
           </div>
           <div>
@@ -223,7 +222,7 @@ export default function GoalieDashboard() {
             </div>
             <div>
               <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Region</label>
-              <input type="text" value={goalieForm.region} onChange={e => setGoalieForm({...goalieForm, region: e.target.value})} required
+              <input type="text" value={goalieForm.region} onChange={e => setGoalieForm({...goalieForm, region: e.target.value})} required placeholder="T.ex. Stockholm"
                 className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
             </div>
           </div>

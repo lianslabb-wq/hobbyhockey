@@ -10,7 +10,9 @@ export default function GoalieDashboard() {
   const [teams, setTeams] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [mode, setMode] = useState('login')
+  const [mode, setMode] = useState(() => {
+    return localStorage.getItem('hh_registered_goalie') ? 'login' : 'register'
+  })
 
   // Auth form
   const [email, setEmail] = useState('')
@@ -49,6 +51,8 @@ export default function GoalieDashboard() {
     const { data } = await supabase.from('goalies').select('*').eq('user_id', user.id)
     if (data?.length > 0) {
       setGoalie(data[0])
+      localStorage.setItem('hh_role', 'goalie')
+      localStorage.setItem('hh_registered_goalie', 'true')
     } else {
       // Don't pre-fill — let goalie enter their own details
     }
@@ -101,6 +105,8 @@ export default function GoalieDashboard() {
       }).select().single()
       if (err) throw err
       setGoalie(data)
+      localStorage.setItem('hh_registered_goalie', 'true')
+      localStorage.setItem('hh_role', 'goalie')
     } catch (err) {
       setError(err.message)
     }

@@ -1,7 +1,18 @@
 import { Link, useLocation } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabase'
 
 export default function Layout({ children }) {
   const location = useLocation()
+  const [user, setUser] = useState(null)
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => setUser(user))
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
 
   const nav = [
     { to: '/', label: 'Hem' },
@@ -27,21 +38,38 @@ export default function Layout({ children }) {
               </p>
             </div>
           </Link>
-          <nav className="flex gap-0.5">
-            {nav.map((item) => (
+          <div className="flex items-center gap-1">
+            <nav className="flex gap-0.5">
+              {nav.map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={`px-4 py-2 text-sm font-medium uppercase tracking-wider no-underline transition-colors ${
+                    location.pathname === item.to
+                      ? 'text-white border-b-2 border-goal-red'
+                      : 'text-ice-muted hover:text-white'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+            {!user ? (
               <Link
-                key={item.to}
-                to={item.to}
-                className={`px-4 py-2 text-sm font-medium uppercase tracking-wider no-underline transition-colors ${
-                  location.pathname === item.to
-                    ? 'text-white border-b-2 border-goal-red'
-                    : 'text-ice-muted hover:text-white'
-                }`}
+                to={localStorage.getItem('hh_role') === 'goalie' ? '/goalie' : '/team'}
+                className="ml-3 px-4 py-2 bg-goal-red text-white rounded text-sm font-semibold uppercase tracking-wider no-underline hover:bg-goal-red-light transition-colors"
               >
-                {item.label}
+                Logga in
               </Link>
-            ))}
-          </nav>
+            ) : (
+              <Link
+                to={localStorage.getItem('hh_role') === 'goalie' ? '/goalie' : '/team'}
+                className="ml-3 px-4 py-2 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider no-underline hover:text-white transition-colors"
+              >
+                Min sida
+              </Link>
+            )}
+          </div>
         </div>
       </header>
       <main className="flex-1 max-w-6xl mx-auto px-4 py-8 w-full">

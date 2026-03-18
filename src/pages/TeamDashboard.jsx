@@ -16,7 +16,9 @@ export default function TeamDashboard() {
   const [goalieSearch, setGoalieSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [mode, setMode] = useState('login')
+  const [mode, setMode] = useState(() => {
+    return localStorage.getItem('hh_registered_team') ? 'login' : 'register'
+  })
 
   // Auth form state
   const [email, setEmail] = useState('')
@@ -61,6 +63,8 @@ export default function TeamDashboard() {
     const { data } = await supabase.from('teams').select('*').eq('user_id', user.id)
     if (data?.length > 0) {
       setTeam(data[0])
+      localStorage.setItem('hh_role', 'team')
+      localStorage.setItem('hh_registered_team', 'true')
     } else {
       // Don't pre-fill contact email — let each team fill in their own
       setTeamForm(prev => prev)
@@ -157,6 +161,8 @@ export default function TeamDashboard() {
       }).select().single()
       if (err) throw err
       setTeam(data)
+      localStorage.setItem('hh_registered_team', 'true')
+      localStorage.setItem('hh_role', 'team')
     } catch (err) {
       setError(err.message)
     }

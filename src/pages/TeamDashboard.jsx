@@ -270,7 +270,13 @@ export default function TeamDashboard() {
   if (!team) {
     return (
       <div className="max-w-lg mx-auto py-12">
-        <h1 className="font-display text-3xl font-bold uppercase tracking-tight mb-2">Registrera ditt lag</h1>
+        <div className="flex items-center justify-between mb-2">
+          <h1 className="font-display text-3xl font-bold uppercase tracking-tight">Registrera ditt lag</h1>
+          <button onClick={async () => { await signOut(); setUser(null) }}
+            className="px-4 py-2 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
+            Logga ut
+          </button>
+        </div>
         <p className="text-ice-muted mb-8">Fyll i uppgifterna nedan för att komma igång.</p>
         {error && <p className="text-goal-red mb-4 text-sm">{error}</p>}
         <form onSubmit={handleRegisterTeam} className="bg-rink-light border border-rink-border rounded-lg p-6 space-y-4">

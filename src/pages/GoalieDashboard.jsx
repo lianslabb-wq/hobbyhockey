@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
-import { signUp, signIn, signOut, getUser } from '../lib/auth'
+import { signUp, signIn, signOut, getUser, resetPassword } from '../lib/auth'
 import RequestCard from '../components/RequestCard'
 
 export default function GoalieDashboard() {
@@ -20,6 +20,10 @@ export default function GoalieDashboard() {
   const [showPassword, setShowPassword] = useState(false)
 
   const [consent, setConsent] = useState(false)
+  const [forgotPassword, setForgotPassword] = useState(false)
+  const [forgotMessage, setForgotMessage] = useState('')
+  const [editing, setEditing] = useState(false)
+  const [editForm, setEditForm] = useState({})
 
   // Goalie registration form
   const [goalieForm, setGoalieForm] = useState({
@@ -137,6 +141,57 @@ export default function GoalieDashboard() {
     if (!err) setGoalie({ ...goalie, available: !goalie.available })
   }
 
+  function handleLogout() {
+    localStorage.removeItem('hh_role')
+    localStorage.removeItem('hh_registered_team')
+    localStorage.removeItem('hh_registered_goalie')
+    signOut()
+    setUser(null)
+    setGoalie(null)
+  }
+
+  async function handleForgotPassword(e) {
+    e.preventDefault()
+    try {
+      await resetPassword(email)
+      setForgotMessage('Vi har skickat en länk till din e-post.')
+    } catch (err) {
+      setForgotMessage(err.message)
+    }
+  }
+
+  async function handleUpdateGoalie(e) {
+    e.preventDefault()
+    const { error: err } = await supabase.from('goalies').update({
+      name: editForm.name,
+      email: editForm.email,
+      phone: editForm.phone || null,
+      location: editForm.location,
+      region: editForm.region,
+      address: editForm.address || null,
+    }).eq('id', goalie.id)
+    if (err) { setError('Kunde inte uppdatera. Försök igen.'); return }
+    setGoalie({ ...goalie, ...editForm })
+    setEditing(false)
+  }
+
+  function handleExportData() {
+    const data = { goalie, requests: requests.filter(r => r.responses?.some(resp => resp.goalie_id === goalie.id)) }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `hobbyhockey-${goalie.name}-data.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  async function handleDeleteAccount() {
+    if (!confirm('Är du säker? Din profil och alla dina svar raderas permanent.')) return
+    await supabase.from('goalies').delete().eq('id', goalie.id)
+    handleLogout()
+  }
+
   if (loading) return <p className="text-ice-muted">Laddar...</p>
 
   // Check email confirmation screen
@@ -196,6 +251,28 @@ export default function GoalieDashboard() {
               </button>
             </div>
           </div>
+          {mode === 'login' && !forgotPassword && (
+            <button type="button" onClick={() => setForgotPassword(true)}
+              className="text-xs text-jersey-blue hover:text-jersey-blue-light bg-transparent border-none cursor-pointer">
+              Glömt lösenord?
+            </button>
+          )}
+          {forgotPassword && (
+            <div className="bg-rink rounded border border-rink-border p-4 space-y-3">
+              <p className="text-sm text-ice-muted">Ange din e-post så skickar vi en återställningslänk.</p>
+              {forgotMessage && <p className="text-sm text-jersey-blue">{forgotMessage}</p>}
+              <div className="flex gap-2">
+                <button type="button" onClick={handleForgotPassword}
+                  className="px-4 py-2 bg-jersey-blue text-puck rounded text-sm font-semibold uppercase tracking-wider hover:bg-jersey-blue-light transition-colors cursor-pointer">
+                  Skicka länk
+                </button>
+                <button type="button" onClick={() => { setForgotPassword(false); setForgotMessage('') }}
+                  className="px-4 py-2 bg-rink-lighter text-ice-muted rounded font-semibold text-sm uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
+                  Avbryt
+                </button>
+              </div>
+            </div>
+          )}
           <button type="submit"
             className="w-full py-2.5 bg-goal-red text-white rounded font-semibold text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer">
             {mode === 'login' ? 'Logga in' : 'Skapa konto'}
@@ -218,7 +295,7 @@ export default function GoalieDashboard() {
       <div className="max-w-md mx-auto py-12">
         <div className="flex items-center justify-between mb-2">
           <h1 className="font-display text-3xl font-bold uppercase tracking-tight">Skapa målvaktsprofil</h1>
-          <button onClick={async () => { await signOut(); setUser(null) }}
+          <button onClick={handleLogout}
             className="px-4 py-2 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
             Logga ut
           </button>
@@ -295,7 +372,7 @@ export default function GoalieDashboard() {
             className={`px-4 py-2.5 rounded text-sm font-semibold uppercase tracking-wider cursor-pointer transition-colors ${goalie.available ? 'bg-goal-green text-white hover:bg-goal-green/80' : 'bg-rink-lighter text-ice-muted hover:text-white'}`}>
             {goalie.available ? 'Tillgänglig' : 'Inte tillgänglig'}
           </button>
-          <button onClick={async () => { await signOut(); setUser(null); setGoalie(null) }}
+          <button onClick={handleLogout}
             className="px-4 py-2.5 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
             Logga ut
           </button>
@@ -357,35 +434,93 @@ export default function GoalieDashboard() {
 
         <div>
           <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Min profil</h2>
-          <div className="bg-rink-light border border-rink-border rounded-lg p-5 space-y-3">
-            <div>
-              <p className="text-xs text-ice-muted/80 uppercase tracking-wider">Namn</p>
-              <p className="font-semibold text-white">{goalie.name}</p>
-            </div>
-            <div>
-              <p className="text-xs text-ice-muted/80 uppercase tracking-wider">E-post</p>
-              <p className="font-semibold text-white">{goalie.email}</p>
-            </div>
-            {goalie.phone && (
+          {editing ? (
+            <form onSubmit={handleUpdateGoalie} className="bg-rink-light border border-rink-border rounded-lg p-5 space-y-3">
               <div>
-                <p className="text-xs text-ice-muted/80 uppercase tracking-wider">Telefon</p>
-                <p className="font-semibold text-white">{goalie.phone}</p>
+                <label className="block text-xs text-ice-muted/80 mb-1 uppercase tracking-wider">Namn</label>
+                <input type="text" value={editForm.name || ''} onChange={e => setEditForm({...editForm, name: e.target.value})} required
+                  className="w-full bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm" />
               </div>
-            )}
-            <div>
-              <p className="text-xs text-ice-muted/80 uppercase tracking-wider">Plats</p>
-              <p className="font-semibold text-white">{goalie.location}, {goalie.region}</p>
-            </div>
-            {goalie.address && (
               <div>
-                <p className="text-xs text-ice-muted/80 uppercase tracking-wider">Adress</p>
-                <p className="font-semibold text-white">{goalie.address}</p>
+                <label className="block text-xs text-ice-muted/80 mb-1 uppercase tracking-wider">E-post</label>
+                <input type="email" value={editForm.email || ''} onChange={e => setEditForm({...editForm, email: e.target.value})} required
+                  className="w-full bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm" />
               </div>
-            )}
-            <div className="flex items-center gap-2 pt-1">
-              <span className={`w-2.5 h-2.5 rounded-full ${goalie.available ? 'bg-goal-green' : 'bg-goal-red'}`} />
-              <span className="text-sm font-medium">{goalie.available ? 'Tillgänglig' : 'Inte tillgänglig'}</span>
+              <div>
+                <label className="block text-xs text-ice-muted/80 mb-1 uppercase tracking-wider">Telefon</label>
+                <input type="tel" value={editForm.phone || ''} onChange={e => setEditForm({...editForm, phone: e.target.value})}
+                  className="w-full bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm" />
+              </div>
+              <div>
+                <label className="block text-xs text-ice-muted/80 mb-1 uppercase tracking-wider">Ort</label>
+                <input type="text" value={editForm.location || ''} onChange={e => setEditForm({...editForm, location: e.target.value})} required
+                  className="w-full bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm" />
+              </div>
+              <div>
+                <label className="block text-xs text-ice-muted/80 mb-1 uppercase tracking-wider">Region</label>
+                <input type="text" value={editForm.region || ''} onChange={e => setEditForm({...editForm, region: e.target.value})} required
+                  className="w-full bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm" />
+              </div>
+              <div>
+                <label className="block text-xs text-ice-muted/80 mb-1 uppercase tracking-wider">Adress</label>
+                <input type="text" value={editForm.address || ''} onChange={e => setEditForm({...editForm, address: e.target.value})}
+                  className="w-full bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm" />
+              </div>
+              <div className="flex gap-2 pt-2">
+                <button type="submit" className="px-4 py-2 bg-goal-red text-white rounded text-sm font-semibold uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer">Spara</button>
+                <button type="button" onClick={() => setEditing(false)} className="px-4 py-2 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer">Avbryt</button>
+              </div>
+            </form>
+          ) : (
+            <div className="bg-rink-light border border-rink-border rounded-lg p-5 space-y-3">
+              <div>
+                <p className="text-xs text-ice-muted/80 uppercase tracking-wider">Namn</p>
+                <p className="font-semibold text-white">{goalie.name}</p>
+              </div>
+              <div>
+                <p className="text-xs text-ice-muted/80 uppercase tracking-wider">E-post</p>
+                <p className="font-semibold text-white">{goalie.email}</p>
+              </div>
+              {goalie.phone && (
+                <div>
+                  <p className="text-xs text-ice-muted/80 uppercase tracking-wider">Telefon</p>
+                  <p className="font-semibold text-white">{goalie.phone}</p>
+                </div>
+              )}
+              <div>
+                <p className="text-xs text-ice-muted/80 uppercase tracking-wider">Plats</p>
+                <p className="font-semibold text-white">{goalie.location}, {goalie.region}</p>
+              </div>
+              {goalie.address && (
+                <div>
+                  <p className="text-xs text-ice-muted/80 uppercase tracking-wider">Adress</p>
+                  <p className="font-semibold text-white">{goalie.address}</p>
+                </div>
+              )}
+              <div className="flex items-center gap-2 pt-1">
+                <span className={`w-2.5 h-2.5 rounded-full ${goalie.available ? 'bg-goal-green' : 'bg-goal-red'}`} />
+                <span className="text-sm font-medium">{goalie.available ? 'Tillgänglig' : 'Inte tillgänglig'}</span>
+              </div>
+              <button onClick={() => { setEditForm({...goalie}); setEditing(true) }}
+                className="text-jersey-blue hover:text-jersey-blue-light text-xs uppercase tracking-wider bg-transparent border-none cursor-pointer mt-2">
+                Redigera profil
+              </button>
             </div>
+          )}
+
+          <div className="mt-8 border-t border-rink-border pt-6">
+            <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Hantera konto</h2>
+            <div className="flex flex-wrap gap-3">
+              <button onClick={handleExportData}
+                className="px-4 py-2 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
+                Exportera min data
+              </button>
+              <button onClick={handleDeleteAccount}
+                className="px-4 py-2 bg-goal-red/20 text-goal-red rounded text-sm font-semibold uppercase tracking-wider hover:bg-goal-red/40 transition-colors cursor-pointer">
+                Radera mitt konto
+              </button>
+            </div>
+            <p className="text-xs text-ice-muted/60 mt-3">Vid radering tas din profil och alla svar bort permanent.</p>
           </div>
         </div>
       </div>

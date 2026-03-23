@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
-import { signUp, signIn, signOut, getUser } from '../lib/auth'
+import { signUp, signIn, signOut, getUser, resetPassword } from '../lib/auth'
 import RequestCard from '../components/RequestCard'
 
 export default function TeamDashboard() {
@@ -26,6 +26,11 @@ export default function TeamDashboard() {
   const [showPassword, setShowPassword] = useState(false)
 
   const [consent, setConsent] = useState(false)
+  const [forgotPassword, setForgotPassword] = useState(false)
+  const [forgotMessage, setForgotMessage] = useState('')
+  const [editing, setEditing] = useState(false)
+  const [editForm, setEditForm] = useState({})
+  const [confirmDelete, setConfirmDelete] = useState(false)
 
   // Team registration form state
   const [teamForm, setTeamForm] = useState({
@@ -202,6 +207,57 @@ export default function TeamDashboard() {
     loadRequests()
   }
 
+  function handleLogout() {
+    localStorage.removeItem('hh_role')
+    localStorage.removeItem('hh_registered_team')
+    localStorage.removeItem('hh_registered_goalie')
+    signOut()
+    setUser(null)
+    setTeam(null)
+  }
+
+  async function handleForgotPassword(e) {
+    e.preventDefault()
+    try {
+      await resetPassword(email)
+      setForgotMessage('Vi har skickat en länk till din e-post.')
+    } catch (err) {
+      setForgotMessage(err.message)
+    }
+  }
+
+  async function handleUpdateTeam(e) {
+    e.preventDefault()
+    const { error: err } = await supabase.from('teams').update({
+      name: editForm.name,
+      type: editForm.type,
+      location: editForm.location,
+      contact_name: editForm.contact_name,
+      contact_email: editForm.contact_email,
+      calendar_url: editForm.calendar_url || null,
+    }).eq('id', team.id)
+    if (err) { setError('Kunde inte uppdatera. Försök igen.'); return }
+    setTeam({ ...team, ...editForm })
+    setEditing(false)
+  }
+
+  function handleExportData() {
+    const data = { team, sessions, requests, favorites }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `hobbyhockey-${team.name}-data.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  async function handleDeleteAccount() {
+    if (!confirm('Är du säker? Alla dina uppgifter, tider och förfrågningar raderas permanent.')) return
+    await supabase.from('teams').delete().eq('id', team.id)
+    handleLogout()
+  }
+
   if (loading) return <p className="text-ice-muted">Laddar...</p>
 
   // Check email confirmation screen
@@ -261,6 +317,28 @@ export default function TeamDashboard() {
               </button>
             </div>
           </div>
+          {mode === 'login' && !forgotPassword && (
+            <button type="button" onClick={() => setForgotPassword(true)}
+              className="text-xs text-jersey-blue hover:text-jersey-blue-light bg-transparent border-none cursor-pointer">
+              Glömt lösenord?
+            </button>
+          )}
+          {forgotPassword && (
+            <div className="bg-rink rounded border border-rink-border p-4 space-y-3">
+              <p className="text-sm text-ice-muted">Ange din e-post så skickar vi en återställningslänk.</p>
+              {forgotMessage && <p className="text-sm text-jersey-blue">{forgotMessage}</p>}
+              <div className="flex gap-2">
+                <button type="button" onClick={handleForgotPassword}
+                  className="px-4 py-2 bg-jersey-blue text-puck rounded text-sm font-semibold uppercase tracking-wider hover:bg-jersey-blue-light transition-colors cursor-pointer">
+                  Skicka länk
+                </button>
+                <button type="button" onClick={() => { setForgotPassword(false); setForgotMessage('') }}
+                  className="px-4 py-2 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
+                  Avbryt
+                </button>
+              </div>
+            </div>
+          )}
           <button type="submit"
             className="w-full py-2.5 bg-goal-red text-white rounded font-semibold text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer">
             {mode === 'login' ? 'Logga in' : 'Skapa konto'}
@@ -283,7 +361,7 @@ export default function TeamDashboard() {
       <div className="max-w-lg mx-auto py-12">
         <div className="flex items-center justify-between mb-2">
           <h1 className="font-display text-3xl font-bold uppercase tracking-tight">Registrera ditt lag</h1>
-          <button onClick={async () => { await signOut(); setUser(null) }}
+          <button onClick={handleLogout}
             className="px-4 py-2 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
             Logga ut
           </button>
@@ -353,6 +431,54 @@ export default function TeamDashboard() {
   return (
     <div>
       {error && <p className="text-goal-red mb-4 text-sm bg-goal-red/10 border border-goal-red/30 rounded-lg px-4 py-3">{error}</p>}
+      {editing && (
+        <form onSubmit={handleUpdateTeam} className="bg-rink-light border border-rink-border rounded-lg p-6 mb-6 space-y-4">
+          <h2 className="font-display text-lg font-bold uppercase tracking-wider">Redigera lag</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Lagnamn</label>
+              <input type="text" value={editForm.name || ''} onChange={e => setEditForm({...editForm, name: e.target.value})} required
+                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Typ</label>
+              <select value={editForm.type || ''} onChange={e => setEditForm({...editForm, type: e.target.value})}
+                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm">
+                <option>Veteran</option><option>Korpen/Motion</option>
+              </select>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Ort</label>
+              <input type="text" value={editForm.location || ''} onChange={e => setEditForm({...editForm, location: e.target.value})} required
+                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Kontaktperson</label>
+              <input type="text" value={editForm.contact_name || ''} onChange={e => setEditForm({...editForm, contact_name: e.target.value})} required
+                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Kontakt e-post</label>
+              <input type="email" value={editForm.contact_email || ''} onChange={e => setEditForm({...editForm, contact_email: e.target.value})} required
+                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Kalender-URL</label>
+              <input type="url" value={editForm.calendar_url || ''} onChange={e => setEditForm({...editForm, calendar_url: e.target.value})}
+                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button type="submit" className="px-5 py-2.5 bg-goal-red text-white rounded font-semibold text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer">Spara</button>
+            <button type="button" onClick={() => setEditing(false)} className="px-5 py-2.5 bg-rink-lighter text-ice-muted rounded font-semibold text-sm uppercase tracking-wider hover:text-white transition-colors cursor-pointer">Avbryt</button>
+          </div>
+        </form>
+      )}
+
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="font-display text-3xl font-bold uppercase tracking-tight">{team.name}</h1>
@@ -363,7 +489,11 @@ export default function TeamDashboard() {
             className="px-5 py-2.5 bg-goal-red text-white rounded font-semibold text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer">
             + Sök målvakt
           </button>
-          <button onClick={async () => { await signOut(); setUser(null); setTeam(null) }}
+          <button onClick={() => { setEditForm({...team}); setEditing(!editing) }}
+            className="px-4 py-2.5 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
+            Redigera
+          </button>
+          <button onClick={handleLogout}
             className="px-4 py-2.5 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
             Logga ut
           </button>
@@ -528,6 +658,21 @@ export default function TeamDashboard() {
             </button>
           </form>
         </div>
+      </div>
+
+      <div className="mt-12 border-t border-rink-border pt-8">
+        <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Hantera konto</h2>
+        <div className="flex flex-wrap gap-3">
+          <button onClick={handleExportData}
+            className="px-5 py-2.5 bg-rink-lighter text-ice-muted rounded font-semibold text-sm uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
+            Exportera min data
+          </button>
+          <button onClick={handleDeleteAccount}
+            className="px-5 py-2.5 bg-goal-red/20 text-goal-red rounded font-semibold text-sm uppercase tracking-wider hover:bg-goal-red/40 transition-colors cursor-pointer">
+            Radera mitt konto
+          </button>
+        </div>
+        <p className="text-xs text-ice-muted/60 mt-3">Vid radering tas alla dina uppgifter, tider och förfrågningar bort permanent.</p>
       </div>
     </div>
   )

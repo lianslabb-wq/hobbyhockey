@@ -16,9 +16,7 @@ export default function TeamDashboard() {
   const [goalieSearch, setGoalieSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [mode, setMode] = useState(() => {
-    return localStorage.getItem('hh_registered_team') ? 'login' : 'register'
-  })
+  const [mode, setMode] = useState('login')
 
   // Auth form state
   const [email, setEmail] = useState('')

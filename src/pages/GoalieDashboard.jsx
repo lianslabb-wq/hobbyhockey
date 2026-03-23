@@ -10,9 +10,7 @@ export default function GoalieDashboard() {
   const [teams, setTeams] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [mode, setMode] = useState(() => {
-    return localStorage.getItem('hh_registered_goalie') ? 'login' : 'register'
-  })
+  const [mode, setMode] = useState('login')
 
   // Auth form
   const [email, setEmail] = useState('')

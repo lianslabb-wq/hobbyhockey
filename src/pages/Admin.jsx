@@ -193,10 +193,6 @@ export default function Admin() {
           <h1 className="font-display text-3xl font-bold uppercase tracking-tight">Admin</h1>
           <p className="text-ice-muted text-sm">{user.email}</p>
         </div>
-        <button onClick={async () => { await signOut(); setUser(null) }}
-          className="px-4 py-2.5 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
-          Logga ut
-        </button>
       </div>
 
       {error && <p className="text-goal-red mb-4 text-sm bg-goal-red/10 border border-goal-red/30 rounded-lg px-4 py-3">{error}</p>}

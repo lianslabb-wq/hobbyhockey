@@ -385,8 +385,12 @@ export default function GoalieDashboard() {
   }
 
   // Goalie dashboard
-  const myResponses = requests.filter(r => r.responses?.some(resp => resp.goalie_id === goalie.id))
+  const today = new Date().toISOString().split('T')[0]
+  const myYesResponses = requests.filter(r => r.responses?.some(resp => resp.goalie_id === goalie.id && resp.answer === 'yes'))
+  const myNoResponses = requests.filter(r => r.responses?.some(resp => resp.goalie_id === goalie.id && resp.answer === 'no'))
   const openRequests = requests.filter(r => r.status === 'open' && !r.responses?.some(resp => resp.goalie_id === goalie.id))
+  const upcomingBooked = myYesResponses.filter(r => r.sessions?.date >= today)
+  const pastBooked = myYesResponses.filter(r => r.sessions?.date < today)
 
   return (
     <div>
@@ -407,11 +411,36 @@ export default function GoalieDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Öppna förfrågningar</h2>
-          {openRequests.length === 0 ? (
-            <p className="text-ice-muted/80">Inga lag söker målvakt just nu.</p>
+          {/* Bokade kommande tider */}
+          <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Bokade kommande tider ({upcomingBooked.length})</h2>
+          {upcomingBooked.length > 0 ? (
+            <div className="space-y-2 mb-8">
+              {upcomingBooked.map(req => (
+                <div key={req.id} className="bg-goal-green/10 border border-goal-green/30 rounded-lg p-4 text-sm">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold text-white">{req.sessions?.date} {req.sessions?.time?.slice(0, 5)}</p>
+                      <p className="text-ice-muted">{req.sessions?.type} @ {req.sessions?.rink}</p>
+                      {req.sessions?.rink_address && <p className="text-ice-muted/70 text-xs">{req.sessions.rink_address}</p>}
+                    </div>
+                    <div className="text-right">
+                      <p className="text-white font-semibold">{req.teams?.name}</p>
+                      <span className="text-goal-green text-xs font-semibold uppercase">Accepterad</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : (
-            <div className="space-y-4">
+            <p className="text-ice-muted/60 mb-8">Du har inga bokade tider ännu. Svara på förfrågningar nedan!</p>
+          )}
+
+          {/* Öppna förfrågningar */}
+          <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Öppna förfrågningar ({openRequests.length})</h2>
+          {openRequests.length === 0 ? (
+            <p className="text-ice-muted/60 mb-8">Inga lag söker målvakt just nu.</p>
+          ) : (
+            <div className="space-y-4 mb-8">
               {openRequests.map(req => {
                 const session = req.sessions
                 const team = req.teams
@@ -426,35 +455,55 @@ export default function GoalieDashboard() {
                     answer: r.answer,
                   })),
                 }
-                const mappedSession = { ...session, rink: session.rink }
                 return (
-                  <RequestCard key={req.id} request={mapped} session={mappedSession}
+                  <RequestCard key={req.id} request={mapped} session={session}
                     isGoalieView={true} onRespond={handleRespond} />
                 )
               })}
             </div>
           )}
 
-          {myResponses.length > 0 && (
+          {/* Tackade nej */}
+          {myNoResponses.length > 0 && (
             <>
-              <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4 mt-10">Mina svar</h2>
-              <div className="space-y-4">
-                {myResponses.map(req => {
-                  const session = req.sessions
-                  const mapped = {
-                    ...req,
-                    teamId: req.team_id,
-                    sessionId: req.session_id,
-                    responses: (req.responses || []).map(r => ({
-                      goalieId: r.goalie_id,
-                      goalieName: r.goalie_id === goalie.id ? goalie.name : 'Målvakt',
-                      answer: r.answer,
-                    })),
-                  }
-                  return <RequestCard key={req.id} request={mapped} session={session} isGoalieView={false} />
-                })}
+              <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Tackade nej ({myNoResponses.length})</h2>
+              <div className="space-y-2 mb-8">
+                {myNoResponses.map(req => (
+                  <div key={req.id} className="bg-rink-light border border-rink-border rounded-lg p-3 text-sm opacity-70">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold text-white">{req.sessions?.date} {req.sessions?.time?.slice(0, 5)}</p>
+                        <p className="text-ice-muted">{req.sessions?.type} @ {req.sessions?.rink}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-white text-sm">{req.teams?.name}</p>
+                        <span className="text-goal-red text-xs font-semibold uppercase">Avböjd</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </>
+          )}
+
+          {/* Passerade tider */}
+          <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Passerade tider ({pastBooked.length})</h2>
+          {pastBooked.length > 0 ? (
+            <div className="space-y-2 mb-8">
+              {pastBooked.map(req => (
+                <div key={req.id} className="bg-rink-light/50 border border-rink-border rounded-lg p-3 text-sm opacity-60">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold text-white">{req.sessions?.date} {req.sessions?.time?.slice(0, 5)}</p>
+                      <p className="text-ice-muted">{req.sessions?.type} @ {req.sessions?.rink}</p>
+                    </div>
+                    <p className="text-white text-sm">{req.teams?.name}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-ice-muted/60 mb-8">Ingen historik ännu.</p>
           )}
         </div>
 

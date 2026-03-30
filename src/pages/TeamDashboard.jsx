@@ -158,7 +158,7 @@ export default function TeamDashboard() {
       }
     } catch (err) {
       if (err.message?.includes('rate') || err.message?.includes('limit') || err.message?.includes('too many')) {
-        setError('Vad roligt att du vill vara med på Hobbyhockey! Just nu är det många som registrerar sig samtidigt. Vänta en stund och försök igen.')
+        setError('Vad roligt att du vill vara med på Hobbyhockey! Just nu är det många som registrerar sig samtidigt. Vänta ungefär en timme och försök igen.')
       } else if (err.message?.includes('already registered') || err.message?.includes('already been registered')) {
         setError('Det finns redan ett konto med den här e-postadressen. Prova att logga in istället.')
       } else {

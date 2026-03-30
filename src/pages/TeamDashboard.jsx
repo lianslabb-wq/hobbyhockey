@@ -123,7 +123,7 @@ export default function TeamDashboard() {
   }
 
   async function loadAllGoalies() {
-    const { data } = await supabase.from('goalie_directory').select('*')
+    const { data } = await supabase.from('goalie_directory').select('*').eq('available', true)
     setAllGoalies(data || [])
   }
 

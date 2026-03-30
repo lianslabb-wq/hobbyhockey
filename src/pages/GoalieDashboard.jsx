@@ -96,13 +96,15 @@ export default function GoalieDashboard() {
       }
 
       // Load my favorite teams
-      const { data: myFavs } = await supabase.from('goalie_favorites').select('id, team_id').eq('goalie_id', goalie.id).catch(() => ({ data: [] }))
-      if (myFavs?.length > 0) {
+      const { data: myFavs, error: gfError } = await supabase.from('goalie_favorites').select('id, team_id').eq('goalie_id', goalie.id)
+      if (!gfError && myFavs?.length > 0) {
         const myFavTeams = myFavs.map(f => ({
           ...f,
           team: (allTeamsData || []).find(t => t.id === f.team_id)
         }))
         setGoalieFavorites(myFavTeams)
+      } else {
+        setGoalieFavorites([])
       }
     }
   }
@@ -117,7 +119,7 @@ export default function GoalieDashboard() {
       setTimeout(() => setSuccessMsg(''), 5000)
       loadRequests()
     } else {
-      setError('Kunde inte lägga till favoritlag. Försök igen.')
+      setError(`Kunde inte lägga till favoritlag: ${err.message}`)
     }
   }
 

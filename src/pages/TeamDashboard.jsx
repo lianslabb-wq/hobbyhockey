@@ -478,10 +478,11 @@ export default function TeamDashboard() {
   }
 
   // Team dashboard
-  const [showAllSessions, setShowAllSessions] = useState(false)
+  const [visibleCount, setVisibleCount] = useState(3)
   const sessionsNeedingGoalie = sessions.filter(s => s.needs_goalie)
-  const visibleSessions = showAllSessions ? sessions : sessions.slice(0, 3)
-  const hiddenCount = sessions.length - 3
+  const visibleSessions = sessions.slice(0, visibleCount)
+  const hasMore = visibleCount < sessions.length
+  const canShowLess = visibleCount > 3
 
   return (
     <div>
@@ -608,18 +609,20 @@ export default function TeamDashboard() {
                   </div>
                 )
               })}
-              {!showAllSessions && hiddenCount > 0 && (
-                <button onClick={() => setShowAllSessions(true)}
-                  className="w-full py-3 bg-rink-lighter text-ice-muted rounded-lg text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer border border-rink-border">
-                  Visa {hiddenCount} fler tider
-                </button>
-              )}
-              {showAllSessions && sessions.length > 3 && (
-                <button onClick={() => setShowAllSessions(false)}
-                  className="w-full py-3 bg-rink-lighter text-ice-muted rounded-lg text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer border border-rink-border">
-                  Visa färre
-                </button>
-              )}
+              <div className="flex gap-2">
+                {hasMore && (
+                  <button onClick={() => setVisibleCount(c => Math.min(c + 5, sessions.length))}
+                    className="flex-1 py-3 bg-rink-lighter text-ice-muted rounded-lg text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer border border-rink-border">
+                    Visa fler tider
+                  </button>
+                )}
+                {canShowLess && (
+                  <button onClick={() => setVisibleCount(3)}
+                    className="flex-1 py-3 bg-rink-lighter text-ice-muted rounded-lg text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer border border-rink-border">
+                    Visa färre
+                  </button>
+                )}
+              </div>
             </div>
           )}
         </div>

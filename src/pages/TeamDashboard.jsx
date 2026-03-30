@@ -496,10 +496,6 @@ export default function TeamDashboard() {
             className="px-4 py-2.5 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
             Redigera
           </button>
-          <button onClick={handleLogout}
-            className="px-4 py-2.5 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
-            Logga ut
-          </button>
         </div>
       </div>
 
@@ -547,6 +543,26 @@ export default function TeamDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
+          <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Kommande tider</h2>
+          {sessions.length === 0 ? (
+            <p className="text-ice-muted/80">Inga tider tillagda.</p>
+          ) : (
+            <div className="space-y-2 mb-8">
+              {sessions.map(s => (
+                <div key={s.id} className={`rounded-lg p-4 text-sm border ${s.needs_goalie ? 'bg-goal-red/10 border-goal-red/30' : 'bg-rink-light border-rink-border'}`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold text-white">{s.date} {s.time?.slice(0, 5)}</p>
+                      <p className="text-ice-muted">{s.type} @ {s.rink}</p>
+                      {s.rink_address && <p className="text-ice-muted/80 text-xs">{s.rink_address}</p>}
+                    </div>
+                    {s.needs_goalie && <span className="text-goal-red text-xs font-semibold uppercase tracking-wider">Saknar målvakt</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
           <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Förfrågningar</h2>
           {requests.length === 0 ? (
             <p className="text-ice-muted/80">Inga aktiva förfrågningar.</p>
@@ -572,6 +588,26 @@ export default function TeamDashboard() {
         </div>
 
         <div>
+          <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Lägg till tid</h2>
+          <form onSubmit={handleCreateSession} className="bg-rink-light border border-rink-border rounded-lg p-4 space-y-3 mb-8">
+            <div className="grid grid-cols-2 gap-3">
+              <input name="date" type="date" required defaultValue={new Date().toISOString().split('T')[0]} className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
+              <input name="time" type="time" required className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <select name="type" className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm">
+                <option>Träning</option>
+                <option>Match</option>
+              </select>
+              <input name="rink" type="text" required placeholder="Hallnamn" className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
+            </div>
+            <input name="rink_address" type="text" placeholder="Adress till ishallen (valfritt)" className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
+            <button type="submit"
+              className="w-full py-2 bg-goal-red/80 text-white rounded text-sm font-semibold uppercase tracking-wider hover:bg-goal-red transition-colors cursor-pointer">
+              Lägg till
+            </button>
+          </form>
+
           <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Favoritmålvakter</h2>
           {favorites.length === 0 ? (
             <p className="text-ice-muted/80 text-sm">Inga favoriter tillagda än.</p>
@@ -592,7 +628,6 @@ export default function TeamDashboard() {
             </div>
           )}
 
-          {/* Search and add goalie as favorite */}
           <div className="mt-3">
             <input
               type="text"
@@ -624,42 +659,6 @@ export default function TeamDashboard() {
               )
             })()}
           </div>
-
-          <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4 mt-8">Kommande tider</h2>
-          {sessions.length === 0 ? (
-            <p className="text-ice-muted/80 text-sm">Inga tider tillagda.</p>
-          ) : (
-            <div className="space-y-2">
-              {sessions.map(s => (
-                <div key={s.id} className={`rounded-lg p-3 text-sm border ${s.needs_goalie ? 'bg-goal-red/10 border-goal-red/30' : 'bg-rink-light border-rink-border'}`}>
-                  <p className="font-semibold text-white">{s.date} {s.time?.slice(0, 5)}</p>
-                  <p className="text-ice-muted">{s.type} @ {s.rink}</p>
-                  {s.rink_address && <p className="text-ice-muted/80 text-xs">{s.rink_address}</p>}
-                  {s.needs_goalie && <p className="text-goal-red text-xs mt-1 font-semibold uppercase tracking-wider">Saknar målvakt</p>}
-                </div>
-              ))}
-            </div>
-          )}
-
-          <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4 mt-8">Lägg till tid</h2>
-          <form onSubmit={handleCreateSession} className="bg-rink-light border border-rink-border rounded-lg p-4 space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <input name="date" type="date" required defaultValue={new Date().toISOString().split('T')[0]} className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
-              <input name="time" type="time" required className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <select name="type" className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm">
-                <option>Träning</option>
-                <option>Match</option>
-              </select>
-              <input name="rink" type="text" required placeholder="Hallnamn" className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
-            </div>
-            <input name="rink_address" type="text" placeholder="Adress till ishallen (valfritt)" className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
-            <button type="submit"
-              className="w-full py-2 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
-              Lägg till
-            </button>
-          </form>
         </div>
       </div>
 

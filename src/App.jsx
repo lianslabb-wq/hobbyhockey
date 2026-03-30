@@ -7,6 +7,7 @@ import GoalieDashboard from './pages/GoalieDashboard'
 import Admin from './pages/Admin'
 import Thanks from './pages/Thanks'
 import Privacy from './pages/Privacy'
+import MyPage from './pages/MyPage'
 import NotFound from './pages/NotFound'
 
 export default function App() {
@@ -14,6 +15,7 @@ export default function App() {
     <Layout>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/me" element={<MyPage />} />
         <Route path="/team" element={<TeamDashboard />} />
         <Route path="/goalie" element={<GoalieDashboard />} />
         <Route path="/about" element={<About />} />

@@ -10,6 +10,7 @@ export default function GoalieDashboard() {
   const [teams, setTeams] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [successMsg, setSuccessMsg] = useState('')
   const [mode, setMode] = useState('login')
 
   // Auth form
@@ -123,6 +124,7 @@ export default function GoalieDashboard() {
 
   async function handleRespond(requestId, answer) {
     setError('')
+    setSuccessMsg('')
     const { error: err } = await supabase.from('responses').insert({
       request_id: requestId,
       goalie_id: goalie.id,
@@ -132,12 +134,17 @@ export default function GoalieDashboard() {
     // If first "yes", mark request as filled
     if (answer === 'yes') {
       const req = requests.find(r => r.id === requestId)
+      const session = req?.sessions
       const hasOtherYes = req?.responses?.some(r => r.answer === 'yes')
       if (!hasOtherYes) {
         await supabase.from('requests').update({ status: 'filled' }).eq('id', requestId)
       }
+      setSuccessMsg(`Du har tackat ja till ${session?.type || 'tid'} ${session?.date || ''} ${session?.time?.slice(0, 5) || ''} @ ${session?.rink || ''}`)
+    } else {
+      setSuccessMsg('Svar skickat — du tackade nej.')
     }
     loadRequests()
+    setTimeout(() => setSuccessMsg(''), 8000)
   }
 
   async function toggleAvailable() {
@@ -366,6 +373,7 @@ export default function GoalieDashboard() {
   return (
     <div>
       {error && <p className="text-goal-red mb-4 text-sm bg-goal-red/10 border border-goal-red/30 rounded-lg px-4 py-3">{error}</p>}
+      {successMsg && <p className="text-goal-green mb-4 text-sm bg-goal-green/10 border border-goal-green/30 rounded-lg px-4 py-3">{successMsg}</p>}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="font-display text-3xl font-bold uppercase tracking-tight">Hej, {goalie.name}!</h1>
@@ -375,10 +383,6 @@ export default function GoalieDashboard() {
           <button onClick={toggleAvailable}
             className={`px-4 py-2.5 rounded text-sm font-semibold uppercase tracking-wider cursor-pointer transition-colors ${goalie.available ? 'bg-goal-green text-white hover:bg-goal-green/80' : 'bg-rink-lighter text-ice-muted hover:text-white'}`}>
             {goalie.available ? 'Tillgänglig' : 'Inte tillgänglig'}
-          </button>
-          <button onClick={handleLogout}
-            className="px-4 py-2.5 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
-            Logga ut
           </button>
         </div>
       </div>

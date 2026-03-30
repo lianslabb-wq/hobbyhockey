@@ -39,8 +39,9 @@ export default function Layout({ children }) {
 
   const nav = [
     { to: '/', label: 'Hem' },
-    { to: '/team', label: user && hasTeam ? 'Mitt lag' : 'Lag' },
-    { to: '/goalie', label: user && hasGoalie ? 'Min målvakt' : 'Målvakt' },
+    ...(user ? [{ to: '/me', label: 'Min sida' }] : []),
+    { to: '/team', label: user && hasTeam ? 'Lagtider' : 'Lag' },
+    { to: '/goalie', label: user && hasGoalie ? 'Målvaktstider' : 'Målvakt' },
     { to: '/about', label: 'Om oss' },
   ]
 

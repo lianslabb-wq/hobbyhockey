@@ -202,7 +202,7 @@ export default function TeamDashboard() {
     e.preventDefault()
     setError('')
     const form = e.target
-    const { error: err } = await supabase.from('sessions').insert({
+    const { data: sessionData, error: err } = await supabase.from('sessions').insert({
       team_id: team.id,
       date: form.date.value,
       time: form.time.value,
@@ -210,12 +210,20 @@ export default function TeamDashboard() {
       rink: form.rink.value,
       rink_address: form.rink_address.value || null,
       needs_goalie: true,
-    })
+    }).select().single()
     if (err) { setError('Kunde inte lägga till tid. Försök igen.'); return }
-    setSuccessMsg(`Tid tillagd: ${form.date.value} ${form.time.value}`)
+    // Auto-create request so goalies can see it immediately
+    await supabase.from('requests').insert({
+      team_id: team.id,
+      session_id: sessionData.id,
+      type: 'open',
+      status: 'open',
+    })
+    setSuccessMsg(`Tid tillagd och förfrågan skickad! Målvakter kan nu se ${form.date.value} ${form.time.value}`)
     setTimeout(() => setSuccessMsg(''), 5000)
     form.reset()
     loadSessions()
+    loadRequests()
   }
 
   async function handleCreateRequest() {

@@ -62,19 +62,44 @@ export default function Admin() {
 
   async function deleteTeam(id) {
     if (!confirm('Radera laget och alla dess tider, förfrågningar och favoriter?')) return
-    await supabase.from('teams').delete().eq('id', id)
+    setError('')
+    // Delete related data first (in order of dependencies)
+    await supabase.from('favorites').delete().eq('team_id', id)
+    await supabase.from('goalie_favorites').delete().eq('team_id', id)
+    const { data: sessions } = await supabase.from('sessions').select('id').eq('team_id', id)
+    if (sessions?.length > 0) {
+      const sessionIds = sessions.map(s => s.id)
+      const { data: reqs } = await supabase.from('requests').select('id').in('session_id', sessionIds)
+      if (reqs?.length > 0) {
+        const reqIds = reqs.map(r => r.id)
+        await supabase.from('responses').delete().in('request_id', reqIds)
+        await supabase.from('requests').delete().in('id', reqIds)
+      }
+      await supabase.from('sessions').delete().in('id', sessionIds)
+    }
+    const { error: err } = await supabase.from('teams').delete().eq('id', id)
+    if (err) setError(`Kunde inte radera lag: ${err.message}`)
     loadAll()
   }
 
   async function deleteGoalie(id) {
-    if (!confirm('Radera denna målvakt och alla dess svar?')) return
-    await supabase.from('goalies').delete().eq('id', id)
+    if (!confirm('Radera denna målvakt och alla dess svar och favoriter?')) return
+    setError('')
+    // Delete related data first
+    await supabase.from('responses').delete().eq('goalie_id', id)
+    await supabase.from('favorites').delete().eq('goalie_id', id)
+    await supabase.from('goalie_favorites').delete().eq('goalie_id', id)
+    const { error: err } = await supabase.from('goalies').delete().eq('id', id)
+    if (err) setError(`Kunde inte radera målvakt: ${err.message}`)
     loadAll()
   }
 
   async function deleteRequest(id) {
-    if (!confirm('Radera denna förfrågan?')) return
-    await supabase.from('requests').delete().eq('id', id)
+    if (!confirm('Radera denna förfrågan och alla svar?')) return
+    setError('')
+    await supabase.from('responses').delete().eq('request_id', id)
+    const { error: err } = await supabase.from('requests').delete().eq('id', id)
+    if (err) setError(`Kunde inte radera förfrågan: ${err.message}`)
     loadAll()
   }
 
@@ -139,7 +164,8 @@ export default function Admin() {
         </div>
       </div>
 
-      <div className="flex gap-2 mb-6">
+      {error && <p className="text-goal-red mb-4 text-sm bg-goal-red/10 border border-goal-red/30 rounded-lg px-4 py-3">{error}</p>}
+      <div className="flex gap-2 mb-6 flex-wrap">
         {tabs.map(t => (
           <button key={t.key} onClick={() => setTab(t.key)}
             className={`px-4 py-2 rounded text-sm font-semibold uppercase tracking-wider cursor-pointer transition-colors ${

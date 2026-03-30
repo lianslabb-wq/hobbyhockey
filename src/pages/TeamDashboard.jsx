@@ -157,7 +157,13 @@ export default function TeamDashboard() {
         await signIn(email, password)
       }
     } catch (err) {
-      setError(err.message)
+      if (err.message?.includes('rate') || err.message?.includes('limit') || err.message?.includes('too many')) {
+        setError('Vad roligt att du vill vara med på Hobbyhockey! Just nu är det många som registrerar sig samtidigt. Vänta en stund och försök igen.')
+      } else if (err.message?.includes('already registered') || err.message?.includes('already been registered')) {
+        setError('Det finns redan ett konto med den här e-postadressen. Prova att logga in istället.')
+      } else {
+        setError(err.message)
+      }
     }
   }
 
@@ -405,7 +411,7 @@ export default function TeamDashboard() {
             <input type="text" value={teamForm.name} onChange={e => setTeamForm({...teamForm, name: e.target.value})} required placeholder="T.ex. Solna Hockey"
               className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-xs text-ice-muted mb-1.5 uppercase tracking-wider">Typ</label>
               <select value={teamForm.type} onChange={e => setTeamForm({...teamForm, type: e.target.value})}
@@ -420,7 +426,7 @@ export default function TeamDashboard() {
                 className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-xs text-ice-muted mb-1.5 uppercase tracking-wider">Kontaktperson</label>
               <input type="text" value={teamForm.contactName} onChange={e => setTeamForm({...teamForm, contactName: e.target.value})} required placeholder="T.ex. Robban"
@@ -466,7 +472,7 @@ export default function TeamDashboard() {
       {editing && (
         <form onSubmit={handleUpdateTeam} className="bg-rink-light border border-rink-border rounded-lg p-6 mb-6 space-y-4">
           <h2 className="font-display text-lg font-bold uppercase tracking-wider">Redigera lag</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-xs text-ice-muted mb-1.5 uppercase tracking-wider">Lagnamn</label>
               <input type="text" value={editForm.name || ''} onChange={e => setEditForm({...editForm, name: e.target.value})} required
@@ -480,7 +486,7 @@ export default function TeamDashboard() {
               </select>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-xs text-ice-muted mb-1.5 uppercase tracking-wider">Ort</label>
               <input type="text" value={editForm.location || ''} onChange={e => setEditForm({...editForm, location: e.target.value})} required
@@ -492,7 +498,7 @@ export default function TeamDashboard() {
                 className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-xs text-ice-muted mb-1.5 uppercase tracking-wider">Kontakt e-post</label>
               <input type="email" value={editForm.contact_email || ''} onChange={e => setEditForm({...editForm, contact_email: e.target.value})} required
@@ -619,11 +625,11 @@ export default function TeamDashboard() {
         <div>
           <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Lägg till tid</h2>
           <form onSubmit={handleCreateSession} className="bg-rink-light border border-rink-border rounded-lg p-4 space-y-3 mb-8">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <input name="date" type="date" required defaultValue={new Date().toISOString().split('T')[0]} min={new Date().toISOString().split('T')[0]} className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
               <input name="time" type="time" required className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <select name="type" className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm">
                 <option>Träning</option>
                 <option>Match</option>

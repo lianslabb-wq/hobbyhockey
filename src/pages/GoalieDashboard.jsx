@@ -140,7 +140,13 @@ export default function GoalieDashboard() {
         await signIn(email, password)
       }
     } catch (err) {
-      setError(err.message)
+      if (err.message?.includes('rate') || err.message?.includes('limit') || err.message?.includes('too many')) {
+        setError('Vad roligt att du vill vara med på Hobbyhockey! Just nu är det många som registrerar sig samtidigt. Vänta en stund och försök igen.')
+      } else if (err.message?.includes('already registered') || err.message?.includes('already been registered')) {
+        setError('Det finns redan ett konto med den här e-postadressen. Prova att logga in istället.')
+      } else {
+        setError(err.message)
+      }
     }
   }
 
@@ -394,7 +400,7 @@ export default function GoalieDashboard() {
             <input type="tel" value={goalieForm.phone} onChange={e => setGoalieForm({...goalieForm, phone: e.target.value})} placeholder="070-123 45 67"
               className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-xs text-ice-muted mb-1.5 uppercase tracking-wider">Ort</label>
               <input type="text" value={goalieForm.location} onChange={e => setGoalieForm({...goalieForm, location: e.target.value})} required placeholder="T.ex. Solna"

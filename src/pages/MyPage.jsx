@@ -119,16 +119,16 @@ export default function MyPage() {
 
               <h3 className="font-display text-lg font-bold uppercase tracking-wider mb-3">Lagtider</h3>
 
-              <h4 className="text-xs text-ice-muted/80 uppercase tracking-wider mb-2 font-semibold">Kommande tider ({upcomingSessions.length})</h4>
+              <h4 className="text-xs text-ice-muted uppercase tracking-wider mb-2 font-semibold">Kommande tider ({upcomingSessions.length})</h4>
               {upcomingSessions.length > 0 ? (
                 <div className="space-y-2 mb-6">
                   {upcomingSessions.map(s => <SessionCard key={s.id} s={s} />)}
                 </div>
               ) : (
-                <p className="text-ice-muted/60 text-sm mb-6">Inga kommande tider.</p>
+                <p className="text-ice-muted text-sm mb-6">Inga kommande tider.</p>
               )}
 
-              <h4 className="text-xs text-ice-muted/80 uppercase tracking-wider mb-2 font-semibold">Förfrågningar ({openTeamRequests.length} öppna)</h4>
+              <h4 className="text-xs text-ice-muted uppercase tracking-wider mb-2 font-semibold">Förfrågningar ({openTeamRequests.length} öppna)</h4>
               {openTeamRequests.length > 0 ? (
                 <div className="space-y-2 mb-6">
                   {openTeamRequests.map(r => (
@@ -139,7 +139,7 @@ export default function MyPage() {
                           <p className="text-ice-muted">{r.sessions?.type}</p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-ice-muted/70 text-xs">Svar: {r.responses?.length || 0}</span>
+                          <span className="text-ice-muted text-xs">Svar: {r.responses?.length || 0}</span>
                           <span className={`px-2 py-0.5 rounded text-xs font-semibold uppercase ${r.status === 'open' ? 'bg-goal-red/15 text-goal-red' : 'bg-goal-green/15 text-goal-green'}`}>
                             {r.status === 'open' ? 'Söker' : 'Tillsatt'}
                           </span>
@@ -149,10 +149,10 @@ export default function MyPage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-ice-muted/60 text-sm mb-6">Inga öppna förfrågningar.</p>
+                <p className="text-ice-muted text-sm mb-6">Inga öppna förfrågningar.</p>
               )}
 
-              <h4 className="text-xs text-ice-muted/80 uppercase tracking-wider mb-2 font-semibold">Passerade tider ({pastSessions.length})</h4>
+              <h4 className="text-xs text-ice-muted uppercase tracking-wider mb-2 font-semibold">Passerade tider ({pastSessions.length})</h4>
               {pastSessions.length > 0 ? (
                 <div className="space-y-2 mb-6">
                   {pastSessions.slice(0, 3).map(s => (
@@ -163,12 +163,12 @@ export default function MyPage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-ice-muted/60 text-sm mb-6">Ingen historik ännu.</p>
+                <p className="text-ice-muted text-sm mb-6">Ingen historik ännu.</p>
               )}
 
               {favorites.length > 0 && (
                 <>
-                  <h4 className="text-xs text-ice-muted/80 uppercase tracking-wider mb-2 font-semibold">Favoritmålvakter ({favorites.length})</h4>
+                  <h4 className="text-xs text-ice-muted uppercase tracking-wider mb-2 font-semibold">Favoritmålvakter ({favorites.length})</h4>
                   <div className="space-y-1 mb-6">
                     {favorites.map(f => (
                       <div key={f.id} className="flex items-center gap-2 text-sm">
@@ -209,7 +209,7 @@ export default function MyPage() {
 
               <h3 className="font-display text-lg font-bold uppercase tracking-wider mb-3">Målvaktstider</h3>
 
-              <h4 className="text-xs text-ice-muted/80 uppercase tracking-wider mb-2 font-semibold">Bokade kommande ({upcomingGoalieGigs.length})</h4>
+              <h4 className="text-xs text-ice-muted uppercase tracking-wider mb-2 font-semibold">Bokade kommande ({upcomingGoalieGigs.length})</h4>
               {upcomingGoalieGigs.length > 0 ? (
                 <div className="space-y-2 mb-6">
                   {upcomingGoalieGigs.map(r => (
@@ -228,10 +228,10 @@ export default function MyPage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-ice-muted/60 text-sm mb-6">Inga bokade tider.</p>
+                <p className="text-ice-muted text-sm mb-6">Inga bokade tider.</p>
               )}
 
-              <h4 className="text-xs text-ice-muted/80 uppercase tracking-wider mb-2 font-semibold">Öppna förfrågningar ({pendingGoalieRequests.length})</h4>
+              <h4 className="text-xs text-ice-muted uppercase tracking-wider mb-2 font-semibold">Öppna förfrågningar ({pendingGoalieRequests.length})</h4>
               {pendingGoalieRequests.length > 0 ? (
                 <div className="space-y-2 mb-6">
                   {pendingGoalieRequests.map(r => (
@@ -250,10 +250,10 @@ export default function MyPage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-ice-muted/60 text-sm mb-6">Inga öppna förfrågningar.</p>
+                <p className="text-ice-muted text-sm mb-6">Inga öppna förfrågningar.</p>
               )}
 
-              <h4 className="text-xs text-ice-muted/80 uppercase tracking-wider mb-2 font-semibold">Passerade tider ({pastGoalieGigs.length})</h4>
+              <h4 className="text-xs text-ice-muted uppercase tracking-wider mb-2 font-semibold">Passerade tider ({pastGoalieGigs.length})</h4>
               {pastGoalieGigs.length > 0 ? (
                 <div className="space-y-2 mb-6">
                   {pastGoalieGigs.slice(0, 3).map(r => (
@@ -264,11 +264,11 @@ export default function MyPage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-ice-muted/60 text-sm mb-6">Ingen historik ännu.</p>
+                <p className="text-ice-muted text-sm mb-6">Ingen historik ännu.</p>
               )}
 
-              <h4 className="text-xs text-ice-muted/80 uppercase tracking-wider mb-2 font-semibold">Favoritlag (0)</h4>
-              <p className="text-ice-muted/60 text-sm mb-6">Inga favoritlag tillagda ännu.</p>
+              <h4 className="text-xs text-ice-muted uppercase tracking-wider mb-2 font-semibold">Favoritlag (0)</h4>
+              <p className="text-ice-muted text-sm mb-6">Inga favoritlag tillagda ännu.</p>
             </>
           ) : (
             <Link to="/goalie" className="bg-rink-light border border-rink-border border-dashed rounded-lg p-6 no-underline hover:border-jersey-blue/40 transition-colors text-center block">

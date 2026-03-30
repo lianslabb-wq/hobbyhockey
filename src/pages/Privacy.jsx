@@ -104,7 +104,7 @@ export default function Privacy() {
         </section>
 
         <section className="bg-rink-light border border-rink-border rounded-lg p-5">
-          <p className="text-ice-muted/80 text-sm">
+          <p className="text-ice-muted text-sm">
             Senast uppdaterad: mars 2026. Vi meddelar registrerade användare om policyn ändras väsentligt.
           </p>
         </section>

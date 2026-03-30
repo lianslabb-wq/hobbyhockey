@@ -100,8 +100,8 @@ export default function Layout({ children }) {
         {children}
       </main>
       <footer className="border-t border-rink-border py-6 text-center">
-        <p className="text-xs text-ice-muted/80 font-semibold uppercase tracking-widest mb-2">Hobbyhockey</p>
-        <Link to="/integritet" className="text-xs text-ice-muted/70 hover:text-white no-underline transition-colors">
+        <p className="text-xs text-ice-muted font-semibold uppercase tracking-widest mb-2">Hobbyhockey</p>
+        <Link to="/integritet" className="text-xs text-ice-muted hover:text-white no-underline transition-colors">
           Integritetspolicy
         </Link>
       </footer>

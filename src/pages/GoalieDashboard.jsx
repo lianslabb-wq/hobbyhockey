@@ -437,7 +437,12 @@ export default function GoalieDashboard() {
   const today = new Date().toISOString().split('T')[0]
   const myYesResponses = requests.filter(r => r.responses?.some(resp => resp.goalie_id === goalie.id && resp.answer === 'yes'))
   const myNoResponses = requests.filter(r => r.responses?.some(resp => resp.goalie_id === goalie.id && resp.answer === 'no'))
-  const openRequests = requests.filter(r => r.status === 'open' && !r.responses?.some(resp => resp.goalie_id === goalie.id))
+  // Exclude requests from teams the user owns (can't hire yourself)
+  const openRequests = requests.filter(r =>
+    r.status === 'open' &&
+    !r.responses?.some(resp => resp.goalie_id === goalie.id) &&
+    r.teams?.user_id !== user?.id
+  )
   const upcomingBooked = myYesResponses.filter(r => r.sessions?.date >= today)
   const pastBooked = myYesResponses.filter(r => r.sessions?.date < today)
 

@@ -60,46 +60,87 @@ export default function Admin() {
     setSupportCount(s.data?.length || 0)
   }
 
+  const [successMsg, setSuccessMsg] = useState('')
+
+  async function tryDelete(table, filter) {
+    const query = supabase.from(table).delete()
+    const { error } = filter(query)
+      ? await filter(query)
+      : await query
+    return error
+  }
+
   async function deleteTeam(id) {
     if (!confirm('Radera laget och alla dess tider, förfrågningar och favoriter?')) return
     setError('')
-    // Delete related data first (in order of dependencies)
-    await supabase.from('favorites').delete().eq('team_id', id)
-    await supabase.from('goalie_favorites').delete().eq('team_id', id)
+    setSuccessMsg('')
+    const errors = []
+
+    let e
+    e = (await supabase.from('favorites').delete().eq('team_id', id)).error
+    if (e) errors.push(`favorites: ${e.message}`)
+    e = (await supabase.from('goalie_favorites').delete().eq('team_id', id)).error
+    if (e) errors.push(`goalie_favorites: ${e.message}`)
+
     const { data: sessions } = await supabase.from('sessions').select('id').eq('team_id', id)
     if (sessions?.length > 0) {
       const sessionIds = sessions.map(s => s.id)
       const { data: reqs } = await supabase.from('requests').select('id').in('session_id', sessionIds)
       if (reqs?.length > 0) {
         const reqIds = reqs.map(r => r.id)
-        await supabase.from('responses').delete().in('request_id', reqIds)
-        await supabase.from('requests').delete().in('id', reqIds)
+        e = (await supabase.from('responses').delete().in('request_id', reqIds)).error
+        if (e) errors.push(`responses: ${e.message}`)
+        e = (await supabase.from('requests').delete().in('id', reqIds)).error
+        if (e) errors.push(`requests: ${e.message}`)
       }
-      await supabase.from('sessions').delete().in('id', sessionIds)
+      e = (await supabase.from('sessions').delete().in('id', sessionIds)).error
+      if (e) errors.push(`sessions: ${e.message}`)
     }
-    const { error: err } = await supabase.from('teams').delete().eq('id', id)
-    if (err) setError(`Kunde inte radera lag: ${err.message}`)
+
+    e = (await supabase.from('teams').delete().eq('id', id)).error
+    if (e) errors.push(`teams: ${e.message}`)
+
+    if (errors.length > 0) setError(`Radering misslyckades: ${errors.join(' | ')}`)
+    else setSuccessMsg('Lag raderat!')
+    setTimeout(() => setSuccessMsg(''), 5000)
     loadAll()
   }
 
   async function deleteGoalie(id) {
     if (!confirm('Radera denna målvakt och alla dess svar och favoriter?')) return
     setError('')
-    // Delete related data first
-    await supabase.from('responses').delete().eq('goalie_id', id)
-    await supabase.from('favorites').delete().eq('goalie_id', id)
-    await supabase.from('goalie_favorites').delete().eq('goalie_id', id)
-    const { error: err } = await supabase.from('goalies').delete().eq('id', id)
-    if (err) setError(`Kunde inte radera målvakt: ${err.message}`)
+    setSuccessMsg('')
+    const errors = []
+
+    let e
+    e = (await supabase.from('responses').delete().eq('goalie_id', id)).error
+    if (e) errors.push(`responses: ${e.message}`)
+    e = (await supabase.from('favorites').delete().eq('goalie_id', id)).error
+    if (e) errors.push(`favorites: ${e.message}`)
+    e = (await supabase.from('goalie_favorites').delete().eq('goalie_id', id)).error
+    if (e) errors.push(`goalie_favorites: ${e.message}`)
+    e = (await supabase.from('goalies').delete().eq('id', id)).error
+    if (e) errors.push(`goalies: ${e.message}`)
+
+    if (errors.length > 0) setError(`Radering misslyckades: ${errors.join(' | ')}`)
+    else setSuccessMsg('Målvakt raderad!')
+    setTimeout(() => setSuccessMsg(''), 5000)
     loadAll()
   }
 
   async function deleteRequest(id) {
     if (!confirm('Radera denna förfrågan och alla svar?')) return
     setError('')
-    await supabase.from('responses').delete().eq('request_id', id)
-    const { error: err } = await supabase.from('requests').delete().eq('id', id)
-    if (err) setError(`Kunde inte radera förfrågan: ${err.message}`)
+    setSuccessMsg('')
+
+    let e
+    e = (await supabase.from('responses').delete().eq('request_id', id)).error
+    if (e) { setError(`responses: ${e.message}`); return }
+    e = (await supabase.from('requests').delete().eq('id', id)).error
+    if (e) { setError(`requests: ${e.message}`); return }
+
+    setSuccessMsg('Förfrågan raderad!')
+    setTimeout(() => setSuccessMsg(''), 5000)
     loadAll()
   }
 
@@ -152,19 +193,14 @@ export default function Admin() {
           <h1 className="font-display text-3xl font-bold uppercase tracking-tight">Admin</h1>
           <p className="text-ice-muted text-sm">{user.email}</p>
         </div>
-        <div className="flex gap-2">
-          <button onClick={loadAll}
-            className="px-4 py-2 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
-            Uppdatera
-          </button>
-          <button onClick={async () => { await signOut(); setUser(null) }}
-            className="px-4 py-2 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
-            Logga ut
-          </button>
-        </div>
+        <button onClick={async () => { await signOut(); setUser(null) }}
+          className="px-4 py-2.5 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
+          Logga ut
+        </button>
       </div>
 
       {error && <p className="text-goal-red mb-4 text-sm bg-goal-red/10 border border-goal-red/30 rounded-lg px-4 py-3">{error}</p>}
+      {successMsg && <p className="text-goal-green mb-4 text-sm bg-goal-green/10 border border-goal-green/30 rounded-lg px-4 py-3">{successMsg}</p>}
       <div className="flex gap-2 mb-6 flex-wrap">
         {tabs.map(t => (
           <button key={t.key} onClick={() => setTab(t.key)}

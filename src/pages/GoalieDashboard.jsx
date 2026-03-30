@@ -109,12 +109,22 @@ export default function GoalieDashboard() {
 
   async function addFavoriteTeam(teamId) {
     if (!goalie) return
+    const teamName = allTeams.find(t => t.id === teamId)?.name || 'Lag'
     const { error: err } = await supabase.from('goalie_favorites').insert({ goalie_id: goalie.id, team_id: teamId })
-    if (!err) { setTeamSearch(''); loadRequests() }
+    if (!err) {
+      setTeamSearch('')
+      setSuccessMsg(`${teamName} tillagt som favoritlag!`)
+      setTimeout(() => setSuccessMsg(''), 5000)
+      loadRequests()
+    } else {
+      setError('Kunde inte lägga till favoritlag. Försök igen.')
+    }
   }
 
   async function removeFavoriteTeam(favId) {
     await supabase.from('goalie_favorites').delete().eq('id', favId)
+    setSuccessMsg('Favoritlag borttaget.')
+    setTimeout(() => setSuccessMsg(''), 5000)
     loadRequests()
   }
 
@@ -184,8 +194,13 @@ export default function GoalieDashboard() {
   }
 
   async function toggleAvailable() {
-    const { error: err } = await supabase.from('goalies').update({ available: !goalie.available }).eq('id', goalie.id)
-    if (!err) setGoalie({ ...goalie, available: !goalie.available })
+    const newStatus = !goalie.available
+    const { error: err } = await supabase.from('goalies').update({ available: newStatus }).eq('id', goalie.id)
+    if (!err) {
+      setGoalie({ ...goalie, available: newStatus })
+      setSuccessMsg(newStatus ? 'Du är nu tillgänglig för förfrågningar!' : 'Du är nu markerad som inte tillgänglig.')
+      setTimeout(() => setSuccessMsg(''), 5000)
+    }
   }
 
   function handleLogout() {

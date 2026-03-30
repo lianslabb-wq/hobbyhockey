@@ -16,6 +16,7 @@ export default function TeamDashboard() {
   const [goalieSearch, setGoalieSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [successMsg, setSuccessMsg] = useState('')
   const [mode, setMode] = useState('login')
 
   // Auth form state
@@ -127,15 +128,20 @@ export default function TeamDashboard() {
   }
 
   async function addFavorite(goalieId) {
+    const goalieName = allGoalies.find(g => g.id === goalieId)?.name || 'Målvakt'
     const { error: err } = await supabase.from('favorites').insert({ team_id: team.id, goalie_id: goalieId })
     if (!err) {
       setGoalieSearch('')
+      setSuccessMsg(`${goalieName} tillagd som favoritmålvakt!`)
+      setTimeout(() => setSuccessMsg(''), 5000)
       loadFavorites()
     }
   }
 
   async function removeFavorite(favoriteId) {
     await supabase.from('favorites').delete().eq('id', favoriteId)
+    setSuccessMsg('Favoritmålvakt borttagen.')
+    setTimeout(() => setSuccessMsg(''), 5000)
     loadFavorites()
   }
 
@@ -194,6 +200,8 @@ export default function TeamDashboard() {
       needs_goalie: true,
     })
     if (err) { setError('Kunde inte lägga till tid. Försök igen.'); return }
+    setSuccessMsg(`Tid tillagd: ${form.date.value} ${form.time.value}`)
+    setTimeout(() => setSuccessMsg(''), 5000)
     form.reset()
     loadSessions()
   }
@@ -208,6 +216,8 @@ export default function TeamDashboard() {
       status: 'open',
     })
     if (err) { setError('Kunde inte skapa förfrågan. Försök igen.'); return }
+    setSuccessMsg('Förfrågan skickad! Målvakter kan nu se och svara.')
+    setTimeout(() => setSuccessMsg(''), 5000)
     setShowNewRequest(false)
     setNewRequest({ sessionId: '', type: 'open' })
     loadRequests()
@@ -452,6 +462,7 @@ export default function TeamDashboard() {
   return (
     <div>
       {error && <p className="text-goal-red mb-4 text-sm bg-goal-red/10 border border-goal-red/30 rounded-lg px-4 py-3">{error}</p>}
+      {successMsg && <p className="text-goal-green mb-4 text-sm bg-goal-green/10 border border-goal-green/30 rounded-lg px-4 py-3">{successMsg}</p>}
       {editing && (
         <form onSubmit={handleUpdateTeam} className="bg-rink-light border border-rink-border rounded-lg p-6 mb-6 space-y-4">
           <h2 className="font-display text-lg font-bold uppercase tracking-wider">Redigera lag</h2>

@@ -12,6 +12,7 @@ export default function MyPage() {
   const [teamRequests, setTeamRequests] = useState([])
   const [goalieRequests, setGoalieRequests] = useState([])
   const [favorites, setFavorites] = useState([])
+  const [goalieFavorites, setGoalieFavorites] = useState([])
   const [loading, setLoading] = useState(true)
 
   const today = new Date().toISOString().split('T')[0]
@@ -57,6 +58,16 @@ export default function MyPage() {
           .select('*, teams(*), sessions(*), responses(*)')
           .order('created_at', { ascending: false })
         setGoalieRequests(allReqs || [])
+
+        // Load goalie's favorite teams
+        const { data: gfData } = await supabase.from('goalie_favorites').select('id, team_id').eq('goalie_id', g.id)
+        if (gfData?.length > 0) {
+          const { data: gfTeams } = await supabase.from('teams').select('id, name, location').in('id', gfData.map(f => f.team_id))
+          setGoalieFavorites(gfData.map(f => ({
+            ...f,
+            team: gfTeams?.find(t => t.id === f.team_id)
+          })))
+        }
       }
 
       setLoading(false)
@@ -267,8 +278,20 @@ export default function MyPage() {
                 <p className="text-ice-muted text-sm mb-6">Ingen historik ännu.</p>
               )}
 
-              <h4 className="text-xs text-ice-muted uppercase tracking-wider mb-2 font-semibold">Favoritlag (0)</h4>
-              <p className="text-ice-muted text-sm mb-6">Inga favoritlag tillagda ännu.</p>
+              <h4 className="text-xs text-ice-muted uppercase tracking-wider mb-2 font-semibold">Favoritlag ({goalieFavorites.length})</h4>
+              {goalieFavorites.length > 0 ? (
+                <div className="space-y-1 mb-6">
+                  {goalieFavorites.map(f => (
+                    <div key={f.id} className="flex items-center gap-2 text-sm">
+                      <span className="w-2 h-2 rounded-full bg-jersey-blue" />
+                      <span className="text-white">{f.team?.name}</span>
+                      <span className="text-ice-muted">{f.team?.location}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-ice-muted text-sm mb-6">Inga favoritlag tillagda ännu.</p>
+              )}
             </>
           ) : (
             <Link to="/goalie" className="bg-rink-light border border-rink-border border-dashed rounded-lg p-6 no-underline hover:border-jersey-blue/40 transition-colors text-center block">

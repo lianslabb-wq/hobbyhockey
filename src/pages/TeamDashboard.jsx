@@ -29,6 +29,9 @@ export default function TeamDashboard() {
   const [editing, setEditing] = useState(false)
   const [editForm, setEditForm] = useState({})
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [changingPassword, setChangingPassword] = useState(false)
+  const [newPassword, setNewPassword] = useState('')
+  const [passwordMsg, setPasswordMsg] = useState('')
 
   // Team registration form state
   const [teamForm, setTeamForm] = useState({
@@ -242,6 +245,21 @@ export default function TeamDashboard() {
     if (err) { setError('Kunde inte uppdatera. Försök igen.'); return }
     setTeam({ ...team, ...editForm })
     setEditing(false)
+  }
+
+  async function handleChangePassword(e) {
+    e.preventDefault()
+    setPasswordMsg('')
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword })
+      if (error) throw error
+      setPasswordMsg('Lösenordet har ändrats!')
+      setNewPassword('')
+      setChangingPassword(false)
+      setTimeout(() => setPasswordMsg(''), 5000)
+    } catch (err) {
+      setPasswordMsg(err.message)
+    }
   }
 
   function handleExportData() {
@@ -664,7 +682,26 @@ export default function TeamDashboard() {
 
       <div className="mt-12 border-t border-rink-border pt-8">
         <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Hantera konto</h2>
+        {passwordMsg && <p className={`text-sm mb-3 ${passwordMsg.includes('ändrats') ? 'text-goal-green' : 'text-goal-red'}`}>{passwordMsg}</p>}
+        {changingPassword && (
+          <form onSubmit={handleChangePassword} className="bg-rink-light border border-rink-border rounded-lg p-4 space-y-3 mb-4">
+            <div>
+              <label className="block text-xs text-ice-muted/80 mb-1 uppercase tracking-wider">Nytt lösenord</label>
+              <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required minLength={6}
+                placeholder="Minst 6 tecken"
+                className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
+            </div>
+            <div className="flex gap-2">
+              <button type="submit" className="px-4 py-2 bg-jersey-blue text-puck rounded text-sm font-semibold uppercase tracking-wider hover:bg-jersey-blue-light transition-colors cursor-pointer">Spara</button>
+              <button type="button" onClick={() => { setChangingPassword(false); setNewPassword('') }} className="px-4 py-2 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer">Avbryt</button>
+            </div>
+          </form>
+        )}
         <div className="flex flex-wrap gap-3">
+          <button onClick={() => setChangingPassword(!changingPassword)}
+            className="px-5 py-2.5 bg-rink-lighter text-ice-muted rounded font-semibold text-sm uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
+            Byt lösenord
+          </button>
           <button onClick={handleExportData}
             className="px-5 py-2.5 bg-rink-lighter text-ice-muted rounded font-semibold text-sm uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
             Exportera min data

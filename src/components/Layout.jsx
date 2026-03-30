@@ -12,8 +12,11 @@ export default function Layout({ children }) {
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => setUser(user))
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null)
+      if (event === 'PASSWORD_RECOVERY') {
+        navigate('/reset-password')
+      }
     })
     return () => subscription.unsubscribe()
   }, [])

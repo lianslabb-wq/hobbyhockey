@@ -321,7 +321,7 @@ export default function GoalieDashboard() {
           <div>
             <label className="block text-xs text-ice-muted mb-1.5 uppercase tracking-wider">Lösenord</label>
             <div className="relative">
-              <input type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} required minLength={8}
+              <input type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
                 className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 pr-10 text-white text-sm" />
               <button type="button" onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-ice-muted hover:text-white bg-transparent border-none cursor-pointer transition-colors">
@@ -696,8 +696,8 @@ export default function GoalieDashboard() {
               <form onSubmit={handleChangePassword} className="bg-rink-light border border-rink-border rounded-lg p-4 space-y-3 mb-4">
                 <div>
                   <label className="block text-xs text-ice-muted mb-1 uppercase tracking-wider">Nytt lösenord</label>
-                  <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required minLength={8}
-                    placeholder="Minst 8 tecken"
+                  <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required minLength={6}
+                    placeholder="Minst 6 tecken"
                     className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
                 </div>
                 <div className="flex gap-2">

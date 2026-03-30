@@ -71,22 +71,24 @@ export default function Home() {
         <h3 className="font-display text-xl font-bold uppercase tracking-wider mb-8 text-ice-muted">
           Så här funkar det
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-          <div>
-            <div className="font-display text-4xl font-bold text-goal-red mb-3">01</div>
-            <p className="text-sm text-ice-muted leading-relaxed">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-0 relative">
+          {/* Timeline connector line */}
+          <div className="hidden sm:block absolute top-5 left-[calc(16.67%+12px)] right-[calc(16.67%+12px)] h-0.5 bg-rink-border" />
+          <div className="relative flex flex-col items-center">
+            <div className="w-10 h-10 rounded-full bg-goal-red/20 border-2 border-goal-red flex items-center justify-center font-display text-lg font-bold text-goal-red mb-3 relative z-10">1</div>
+            <p className="text-sm text-ice-muted leading-relaxed px-4">
               Laget skapar en förfrågan med tid och plats
             </p>
           </div>
-          <div>
-            <div className="font-display text-4xl font-bold text-goal-red mb-3">02</div>
-            <p className="text-sm text-ice-muted leading-relaxed">
+          <div className="relative flex flex-col items-center">
+            <div className="w-10 h-10 rounded-full bg-goal-red/20 border-2 border-goal-red flex items-center justify-center font-display text-lg font-bold text-goal-red mb-3 relative z-10">2</div>
+            <p className="text-sm text-ice-muted leading-relaxed px-4">
               Målvakter får en notis och svarar om de kan
             </p>
           </div>
-          <div>
-            <div className="font-display text-4xl font-bold text-goal-red mb-3">03</div>
-            <p className="text-sm text-ice-muted leading-relaxed">
+          <div className="relative flex flex-col items-center">
+            <div className="w-10 h-10 rounded-full bg-goal-red/20 border-2 border-goal-red flex items-center justify-center font-display text-lg font-bold text-goal-red mb-3 relative z-10">3</div>
+            <p className="text-sm text-ice-muted leading-relaxed px-4">
               Först till kvarn — bekräftelse skickas direkt
             </p>
           </div>

@@ -591,7 +591,7 @@ export default function TeamDashboard() {
           <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Lägg till tid</h2>
           <form onSubmit={handleCreateSession} className="bg-rink-light border border-rink-border rounded-lg p-4 space-y-3 mb-8">
             <div className="grid grid-cols-2 gap-3">
-              <input name="date" type="date" required defaultValue={new Date().toISOString().split('T')[0]} className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
+              <input name="date" type="date" required defaultValue={new Date().toISOString().split('T')[0]} min={new Date().toISOString().split('T')[0]} className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
               <input name="time" type="time" required className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -610,7 +610,7 @@ export default function TeamDashboard() {
 
           <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Favoritmålvakter</h2>
           {favorites.length === 0 ? (
-            <p className="text-ice-muted/80 text-sm">Inga favoriter tillagda än.</p>
+            <p className="text-ice-muted/80 text-sm mb-2">Inga favoriter tillagda än. Sök och lägg till nedan.</p>
           ) : (
             <div className="space-y-2">
               {favorites.map(f => (

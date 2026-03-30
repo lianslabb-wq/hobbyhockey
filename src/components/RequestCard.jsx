@@ -38,7 +38,7 @@ export default function RequestCard({ request, session, team: teamProp, onRespon
         </div>
         <div>
           <p className="text-ice-muted/80 mb-1 text-xs uppercase tracking-wider">Tid</p>
-          <p className="font-semibold text-white">{session.time}</p>
+          <p className="font-semibold text-white">{session.time?.slice(0, 5)}</p>
         </div>
         <div>
           <p className="text-ice-muted/80 mb-1 text-xs uppercase tracking-wider">Plats</p>
@@ -65,16 +65,18 @@ export default function RequestCard({ request, session, team: teamProp, onRespon
           </div>
         )}
       </div>
-      {request.responses?.length > 0 && (
+      {!isGoalieView && (
         <div className="mt-4 pt-4 border-t border-rink-border">
-          <p className="text-xs text-ice-muted/80 mb-2 uppercase tracking-wider">Svar ({request.responses.length})</p>
-          {request.responses.map((r, i) => (
+          <p className="text-xs text-ice-muted/80 mb-2 uppercase tracking-wider">Svar ({request.responses?.length || 0})</p>
+          {request.responses?.length > 0 ? request.responses.map((r, i) => (
             <div key={i} className="flex items-center gap-2 text-sm">
               <span className={`w-2 h-2 rounded-full ${r.answer === 'yes' ? 'bg-goal-green' : 'bg-goal-red'}`} />
               <span className="text-white">{r.goalieName}</span>
               <span className="text-ice-muted/70">{r.answer === 'yes' ? 'Tillgänglig' : 'Kan inte'}</span>
             </div>
-          ))}
+          )) : (
+            <p className="text-ice-muted/50 text-sm">Inga svar ännu</p>
+          )}
         </div>
       )}
     </div>

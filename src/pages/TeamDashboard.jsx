@@ -517,7 +517,7 @@ export default function TeamDashboard() {
                     className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm">
                     <option value="">Välj tillfälle...</option>
                     {sessionsNeedingGoalie.map(s => (
-                      <option key={s.id} value={s.id}>{s.date} {s.time} — {s.type} @ {s.rink}</option>
+                      <option key={s.id} value={s.id}>{s.date} {s.time?.slice(0, 5)} — {s.type} @ {s.rink}</option>
                     ))}
                   </select>
                 </div>
@@ -632,7 +632,7 @@ export default function TeamDashboard() {
             <div className="space-y-2">
               {sessions.map(s => (
                 <div key={s.id} className={`rounded-lg p-3 text-sm border ${s.needs_goalie ? 'bg-goal-red/10 border-goal-red/30' : 'bg-rink-light border-rink-border'}`}>
-                  <p className="font-semibold text-white">{s.date} {s.time}</p>
+                  <p className="font-semibold text-white">{s.date} {s.time?.slice(0, 5)}</p>
                   <p className="text-ice-muted">{s.type} @ {s.rink}</p>
                   {s.rink_address && <p className="text-ice-muted/80 text-xs">{s.rink_address}</p>}
                   {s.needs_goalie && <p className="text-goal-red text-xs mt-1 font-semibold uppercase tracking-wider">Saknar målvakt</p>}
@@ -644,7 +644,7 @@ export default function TeamDashboard() {
           <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4 mt-8">Lägg till tid</h2>
           <form onSubmit={handleCreateSession} className="bg-rink-light border border-rink-border rounded-lg p-4 space-y-3">
             <div className="grid grid-cols-2 gap-3">
-              <input name="date" type="date" required className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
+              <input name="date" type="date" required defaultValue={new Date().toISOString().split('T')[0]} className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
               <input name="time" type="time" required className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
             </div>
             <div className="grid grid-cols-2 gap-3">

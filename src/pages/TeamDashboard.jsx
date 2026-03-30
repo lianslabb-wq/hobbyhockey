@@ -34,6 +34,7 @@ export default function TeamDashboard() {
   const [changingPassword, setChangingPassword] = useState(false)
   const [newPassword, setNewPassword] = useState('')
   const [passwordMsg, setPasswordMsg] = useState('')
+  const [visibleCount, setVisibleCount] = useState(3)
 
   // Team registration form state
   const [teamForm, setTeamForm] = useState({
@@ -478,7 +479,6 @@ export default function TeamDashboard() {
   }
 
   // Team dashboard
-  const [visibleCount, setVisibleCount] = useState(3)
   const sessionsNeedingGoalie = sessions.filter(s => s.needs_goalie)
   const visibleSessions = sessions.slice(0, visibleCount)
   const hasMore = visibleCount < sessions.length

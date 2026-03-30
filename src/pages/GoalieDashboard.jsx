@@ -201,6 +201,18 @@ export default function GoalieDashboard() {
     setTimeout(() => setSuccessMsg(''), 8000)
   }
 
+  async function handleCancelBooking(requestId) {
+    if (!confirm('Vill du avboka den här tiden? Förfrågan öppnas igen för andra målvakter.')) return
+    setError('')
+    // Delete my response
+    await supabase.from('responses').delete().eq('request_id', requestId).eq('goalie_id', goalie.id)
+    // Set request back to open
+    await supabase.from('requests').update({ status: 'open' }).eq('id', requestId)
+    setSuccessMsg('Tiden avbokad. Förfrågan är nu öppen igen.')
+    setTimeout(() => setSuccessMsg(''), 5000)
+    loadRequests()
+  }
+
   async function toggleAvailable() {
     const newStatus = !goalie.available
     const { error: err } = await supabase.from('goalies').update({ available: newStatus }).eq('id', goalie.id)
@@ -481,6 +493,12 @@ export default function GoalieDashboard() {
                       <p className="text-white font-semibold">{req.teams?.name}</p>
                       <span className="text-goal-green text-xs font-semibold uppercase">Accepterad</span>
                     </div>
+                  </div>
+                  <div className="mt-2 pt-2 border-t border-goal-green/20">
+                    <button onClick={() => handleCancelBooking(req.id)}
+                      className="text-ice-muted hover:text-goal-red text-xs uppercase tracking-wider bg-transparent border-none cursor-pointer transition-colors">
+                      Kan inte längre — avboka
+                    </button>
                   </div>
                 </div>
               ))}

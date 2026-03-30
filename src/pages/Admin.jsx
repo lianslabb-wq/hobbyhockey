@@ -11,6 +11,8 @@ export default function Admin() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [tab, setTab] = useState('teams')
+  const [editingItem, setEditingItem] = useState(null)
+  const [editForm, setEditForm] = useState({})
 
   const [teams, setTeams] = useState([])
   const [goalies, setGoalies] = useState([])
@@ -144,6 +146,30 @@ export default function Admin() {
     loadAll()
   }
 
+  async function saveTeam() {
+    const { error: err } = await supabase.from('teams').update({
+      name: editForm.name, type: editForm.type, location: editForm.location,
+      contact_name: editForm.contact_name, contact_email: editForm.contact_email,
+    }).eq('id', editingItem)
+    if (err) { setError(err.message); return }
+    setEditingItem(null)
+    setSuccessMsg('Lag uppdaterat!')
+    setTimeout(() => setSuccessMsg(''), 5000)
+    loadAll()
+  }
+
+  async function saveGoalie() {
+    const { error: err } = await supabase.from('goalies').update({
+      name: editForm.name, email: editForm.email, phone: editForm.phone,
+      location: editForm.location, region: editForm.region, available: editForm.available,
+    }).eq('id', editingItem)
+    if (err) { setError(err.message); return }
+    setEditingItem(null)
+    setSuccessMsg('Målvakt uppdaterad!')
+    setTimeout(() => setSuccessMsg(''), 5000)
+    loadAll()
+  }
+
   if (loading) return <p className="text-ice-muted">Laddar...</p>
 
   if (!user) {
@@ -211,16 +237,43 @@ export default function Admin() {
       {tab === 'teams' && (
         <div className="space-y-3">
           {teams.map(t => (
-            <div key={t.id} className="bg-rink-light border border-rink-border rounded-lg p-4 flex items-start justify-between">
-              <div>
-                <p className="font-semibold text-white">{t.name}</p>
-                <p className="text-sm text-ice-muted">{t.type} &middot; {t.location} &middot; {t.contact_name} ({t.contact_email})</p>
-                <p className="text-xs text-ice-muted mt-1 font-mono">ID: {t.id}</p>
-              </div>
-              <button onClick={() => deleteTeam(t.id)}
-                className="px-3 py-1.5 bg-goal-red/20 text-goal-red rounded text-xs font-semibold uppercase tracking-wider hover:bg-goal-red/40 transition-colors cursor-pointer">
-                Radera
-              </button>
+            <div key={t.id} className="bg-rink-light border border-rink-border rounded-lg p-4">
+              {editingItem === t.id ? (
+                <div className="space-y-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <input value={editForm.name || ''} onChange={e => setEditForm({...editForm, name: e.target.value})} placeholder="Lagnamn"
+                      className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
+                    <input value={editForm.location || ''} onChange={e => setEditForm({...editForm, location: e.target.value})} placeholder="Ort"
+                      className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
+                    <input value={editForm.contact_name || ''} onChange={e => setEditForm({...editForm, contact_name: e.target.value})} placeholder="Kontaktperson"
+                      className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
+                    <input value={editForm.contact_email || ''} onChange={e => setEditForm({...editForm, contact_email: e.target.value})} placeholder="E-post"
+                      className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={saveTeam} className="px-3 py-1.5 bg-goal-green text-white rounded text-xs font-semibold uppercase tracking-wider cursor-pointer">Spara</button>
+                    <button onClick={() => setEditingItem(null)} className="px-3 py-1.5 bg-rink-lighter text-ice-muted rounded text-xs font-semibold uppercase tracking-wider cursor-pointer">Avbryt</button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="font-semibold text-white">{t.name}</p>
+                    <p className="text-sm text-ice-muted">{t.type} &middot; {t.location} &middot; {t.contact_name} ({t.contact_email})</p>
+                    <p className="text-xs text-ice-muted mt-1 font-mono">ID: {t.id}</p>
+                  </div>
+                  <div className="flex gap-2 shrink-0 ml-2">
+                    <button onClick={() => { setEditingItem(t.id); setEditForm({...t}) }}
+                      className="px-3 py-1.5 bg-jersey-blue/20 text-jersey-blue rounded text-xs font-semibold uppercase tracking-wider hover:bg-jersey-blue/30 transition-colors cursor-pointer">
+                      Redigera
+                    </button>
+                    <button onClick={() => deleteTeam(t.id)}
+                      className="px-3 py-1.5 bg-goal-red/20 text-goal-red rounded text-xs font-semibold uppercase tracking-wider hover:bg-goal-red/40 transition-colors cursor-pointer">
+                      Radera
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
           {teams.length === 0 && <p className="text-ice-muted">Inga lag registrerade.</p>}
@@ -230,19 +283,52 @@ export default function Admin() {
       {tab === 'goalies' && (
         <div className="space-y-3">
           {goalies.map(g => (
-            <div key={g.id} className="bg-rink-light border border-rink-border rounded-lg p-4 flex items-start justify-between">
-              <div>
-                <p className="font-semibold text-white">
-                  {g.name}
-                  <span className={`ml-2 inline-block w-2 h-2 rounded-full ${g.available ? 'bg-goal-green' : 'bg-ice-muted/40'}`} />
-                </p>
-                <p className="text-sm text-ice-muted">{g.location} · {g.email}{g.phone && <> · {g.phone}</>}</p>
-                <p className="text-xs text-ice-muted mt-1 font-mono">ID: {g.id}</p>
-              </div>
-              <button onClick={() => deleteGoalie(g.id)}
-                className="px-3 py-1.5 bg-goal-red/20 text-goal-red rounded text-xs font-semibold uppercase tracking-wider hover:bg-goal-red/40 transition-colors cursor-pointer">
-                Radera
-              </button>
+            <div key={g.id} className="bg-rink-light border border-rink-border rounded-lg p-4">
+              {editingItem === g.id ? (
+                <div className="space-y-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <input value={editForm.name || ''} onChange={e => setEditForm({...editForm, name: e.target.value})} placeholder="Namn"
+                      className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
+                    <input value={editForm.email || ''} onChange={e => setEditForm({...editForm, email: e.target.value})} placeholder="E-post"
+                      className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
+                    <input value={editForm.phone || ''} onChange={e => setEditForm({...editForm, phone: e.target.value})} placeholder="Telefon"
+                      className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
+                    <input value={editForm.location || ''} onChange={e => setEditForm({...editForm, location: e.target.value})} placeholder="Ort"
+                      className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
+                    <input value={editForm.region || ''} onChange={e => setEditForm({...editForm, region: e.target.value})} placeholder="Region"
+                      className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
+                    <label className="flex items-center gap-2 text-sm text-ice-muted px-3 py-2">
+                      <input type="checkbox" checked={editForm.available || false} onChange={e => setEditForm({...editForm, available: e.target.checked})} />
+                      Tillgänglig
+                    </label>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={saveGoalie} className="px-3 py-1.5 bg-goal-green text-white rounded text-xs font-semibold uppercase tracking-wider cursor-pointer">Spara</button>
+                    <button onClick={() => setEditingItem(null)} className="px-3 py-1.5 bg-rink-lighter text-ice-muted rounded text-xs font-semibold uppercase tracking-wider cursor-pointer">Avbryt</button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="font-semibold text-white">
+                      {g.name}
+                      <span className={`ml-2 inline-block w-2 h-2 rounded-full ${g.available ? 'bg-goal-green' : 'bg-ice-muted/40'}`} />
+                    </p>
+                    <p className="text-sm text-ice-muted">{g.location} · {g.email}{g.phone && <> · {g.phone}</>}</p>
+                    <p className="text-xs text-ice-muted mt-1 font-mono">ID: {g.id}</p>
+                  </div>
+                  <div className="flex gap-2 shrink-0 ml-2">
+                    <button onClick={() => { setEditingItem(g.id); setEditForm({...g}) }}
+                      className="px-3 py-1.5 bg-jersey-blue/20 text-jersey-blue rounded text-xs font-semibold uppercase tracking-wider hover:bg-jersey-blue/30 transition-colors cursor-pointer">
+                      Redigera
+                    </button>
+                    <button onClick={() => deleteGoalie(g.id)}
+                      className="px-3 py-1.5 bg-goal-red/20 text-goal-red rounded text-xs font-semibold uppercase tracking-wider hover:bg-goal-red/40 transition-colors cursor-pointer">
+                      Radera
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
           {goalies.length === 0 && <p className="text-ice-muted">Inga målvakter registrerade.</p>}

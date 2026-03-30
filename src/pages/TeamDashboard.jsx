@@ -70,8 +70,13 @@ export default function TeamDashboard() {
       localStorage.setItem('hh_role', 'team')
       localStorage.setItem('hh_registered_team', 'true')
     } else {
-      // Don't pre-fill contact email — let each team fill in their own
-      setTeamForm(prev => prev)
+      // Pre-fill from auth email + goalie profile name if available
+      const prefill = { contactEmail: user.email || '' }
+      const { data: goalieData } = await supabase.from('goalies').select('name').eq('user_id', user.id)
+      if (goalieData?.length > 0) {
+        prefill.contactName = goalieData[0].name
+      }
+      setTeamForm(prev => ({ ...prev, ...prefill }))
     }
   }
 
@@ -298,13 +303,13 @@ export default function TeamDashboard() {
           <div>
             <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">E-post</label>
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
-              className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+              className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
           </div>
           <div>
             <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Lösenord</label>
             <div className="relative">
               <input type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
-                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 pr-10 text-white text-sm" />
+                className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 pr-10 text-white text-sm" />
               <button type="button" onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-ice-muted/60 hover:text-white bg-transparent border-none cursor-pointer transition-colors">
                 {showPassword ? (
@@ -370,13 +375,13 @@ export default function TeamDashboard() {
           <div>
             <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Lagnamn</label>
             <input type="text" value={teamForm.name} onChange={e => setTeamForm({...teamForm, name: e.target.value})} required placeholder="T.ex. Solna Hockey"
-              className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+              className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Typ</label>
               <select value={teamForm.type} onChange={e => setTeamForm({...teamForm, type: e.target.value})}
-                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm">
+                className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm">
                 <option>Veteran</option>
                 <option>Korpen/Motion</option>
               </select>
@@ -384,25 +389,25 @@ export default function TeamDashboard() {
             <div>
               <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Ort</label>
               <input type="text" value={teamForm.location} onChange={e => setTeamForm({...teamForm, location: e.target.value})} required placeholder="T.ex. Solna"
-                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+                className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Kontaktperson</label>
               <input type="text" value={teamForm.contactName} onChange={e => setTeamForm({...teamForm, contactName: e.target.value})} required placeholder="T.ex. Robban"
-                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+                className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
             </div>
             <div>
               <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Kontakt e-post</label>
               <input type="email" value={teamForm.contactEmail} onChange={e => setTeamForm({...teamForm, contactEmail: e.target.value})} required placeholder="T.ex. namn@exempel.se"
-                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+                className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
             </div>
           </div>
           <div>
             <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Följkalender-URL (valfritt)</label>
             <input type="url" value={teamForm.calendarUrl} onChange={e => setTeamForm({...teamForm, calendarUrl: e.target.value})} placeholder="https://sportadmin.se/cal/..."
-              className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+              className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
           </div>
           <label className="flex items-start gap-3 cursor-pointer">
             <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)}
@@ -436,12 +441,12 @@ export default function TeamDashboard() {
             <div>
               <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Lagnamn</label>
               <input type="text" value={editForm.name || ''} onChange={e => setEditForm({...editForm, name: e.target.value})} required
-                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+                className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
             </div>
             <div>
               <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Typ</label>
               <select value={editForm.type || ''} onChange={e => setEditForm({...editForm, type: e.target.value})}
-                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm">
+                className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm">
                 <option>Veteran</option><option>Korpen/Motion</option>
               </select>
             </div>
@@ -450,24 +455,24 @@ export default function TeamDashboard() {
             <div>
               <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Ort</label>
               <input type="text" value={editForm.location || ''} onChange={e => setEditForm({...editForm, location: e.target.value})} required
-                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+                className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
             </div>
             <div>
               <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Kontaktperson</label>
               <input type="text" value={editForm.contact_name || ''} onChange={e => setEditForm({...editForm, contact_name: e.target.value})} required
-                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+                className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Kontakt e-post</label>
               <input type="email" value={editForm.contact_email || ''} onChange={e => setEditForm({...editForm, contact_email: e.target.value})} required
-                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+                className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
             </div>
             <div>
               <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Kalender-URL</label>
               <input type="url" value={editForm.calendar_url || ''} onChange={e => setEditForm({...editForm, calendar_url: e.target.value})}
-                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+                className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
             </div>
           </div>
           <div className="flex gap-2">
@@ -509,7 +514,7 @@ export default function TeamDashboard() {
                 <div>
                   <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Tillfälle</label>
                   <select value={newRequest.sessionId} onChange={e => setNewRequest({...newRequest, sessionId: e.target.value})}
-                    className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm">
+                    className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm">
                     <option value="">Välj tillfälle...</option>
                     {sessionsNeedingGoalie.map(s => (
                       <option key={s.id} value={s.id}>{s.date} {s.time} — {s.type} @ {s.rink}</option>
@@ -519,7 +524,7 @@ export default function TeamDashboard() {
                 <div>
                   <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Skicka till</label>
                   <select value={newRequest.type} onChange={e => setNewRequest({...newRequest, type: e.target.value})}
-                    className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm">
+                    className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm">
                     <option value="favorites">Mina favoriter ({favorites.length} st)</option>
                     <option value="open">Alla målvakter (öppen förfrågan)</option>
                   </select>
@@ -594,7 +599,7 @@ export default function TeamDashboard() {
               value={goalieSearch}
               onChange={e => setGoalieSearch(e.target.value)}
               placeholder="Sök målvakt..."
-              className="w-full bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm"
+              className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm"
             />
             {goalieSearch.length >= 2 && (() => {
               const favoriteGoalieIds = favorites.map(f => f.goalie_id)
@@ -639,17 +644,17 @@ export default function TeamDashboard() {
           <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4 mt-8">Lägg till tid</h2>
           <form onSubmit={handleCreateSession} className="bg-rink-light border border-rink-border rounded-lg p-4 space-y-3">
             <div className="grid grid-cols-2 gap-3">
-              <input name="date" type="date" required className="bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm" />
-              <input name="time" type="time" required className="bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm" />
+              <input name="date" type="date" required className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
+              <input name="time" type="time" required className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <select name="type" className="bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm">
+              <select name="type" className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm">
                 <option>Träning</option>
                 <option>Match</option>
               </select>
-              <input name="rink" type="text" required placeholder="Hallnamn" className="bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm" />
+              <input name="rink" type="text" required placeholder="Hallnamn" className="bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
             </div>
-            <input name="rink_address" type="text" placeholder="Adress till ishallen (valfritt)" className="w-full bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm" />
+            <input name="rink_address" type="text" placeholder="Adress till ishallen (valfritt)" className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
             <button type="submit"
               className="w-full py-2 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
               Lägg till

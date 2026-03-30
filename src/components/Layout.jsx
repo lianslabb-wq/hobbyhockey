@@ -1,10 +1,13 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
 export default function Layout({ children }) {
   const location = useLocation()
+  const navigate = useNavigate()
   const [user, setUser] = useState(null)
+  const [hasTeam, setHasTeam] = useState(false)
+  const [hasGoalie, setHasGoalie] = useState(false)
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => setUser(user))
@@ -14,10 +17,30 @@ export default function Layout({ children }) {
     return () => subscription.unsubscribe()
   }, [])
 
+  useEffect(() => {
+    if (!user) { setHasTeam(false); setHasGoalie(false); return }
+    Promise.all([
+      supabase.from('teams').select('id').eq('user_id', user.id),
+      supabase.from('goalies').select('id').eq('user_id', user.id),
+    ]).then(([teamRes, goalieRes]) => {
+      setHasTeam(teamRes.data?.length > 0)
+      setHasGoalie(goalieRes.data?.length > 0)
+    })
+  }, [user, location.pathname])
+
+  function handleLogout() {
+    localStorage.removeItem('hh_role')
+    localStorage.removeItem('hh_registered_team')
+    localStorage.removeItem('hh_registered_goalie')
+    supabase.auth.signOut()
+    setUser(null)
+    navigate('/')
+  }
+
   const nav = [
     { to: '/', label: 'Hem' },
-    { to: '/team', label: 'Lag' },
-    { to: '/goalie', label: 'Målvakt' },
+    { to: '/team', label: user && hasTeam ? 'Mitt lag' : 'Lag' },
+    { to: '/goalie', label: user && hasGoalie ? 'Min målvakt' : 'Målvakt' },
     { to: '/about', label: 'Om oss' },
   ]
 
@@ -62,12 +85,12 @@ export default function Layout({ children }) {
                 Logga in
               </Link>
             ) : (
-              <Link
-                to={localStorage.getItem('hh_role') === 'goalie' ? '/goalie' : '/team'}
-                className="ml-3 px-4 py-2 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider no-underline hover:text-white transition-colors"
+              <button
+                onClick={handleLogout}
+                className="ml-3 px-4 py-2 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer border-none"
               >
-                Min sida
-              </Link>
+                Logga ut
+              </button>
             )}
           </div>
         </div>

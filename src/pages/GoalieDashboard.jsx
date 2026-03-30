@@ -57,7 +57,13 @@ export default function GoalieDashboard() {
       localStorage.setItem('hh_role', 'goalie')
       localStorage.setItem('hh_registered_goalie', 'true')
     } else {
-      // Don't pre-fill — let goalie enter their own details
+      // Pre-fill from auth email + team profile name if available
+      const prefill = { email: user.email || '' }
+      const { data: teamData } = await supabase.from('teams').select('contact_name').eq('user_id', user.id)
+      if (teamData?.length > 0 && teamData[0].contact_name) {
+        prefill.name = teamData[0].contact_name
+      }
+      setGoalieForm(prev => ({ ...prev, ...prefill }))
     }
   }
 
@@ -232,13 +238,13 @@ export default function GoalieDashboard() {
           <div>
             <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">E-post</label>
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
-              className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+              className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
           </div>
           <div>
             <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Lösenord</label>
             <div className="relative">
               <input type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
-                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 pr-10 text-white text-sm" />
+                className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 pr-10 text-white text-sm" />
               <button type="button" onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-ice-muted/60 hover:text-white bg-transparent border-none cursor-pointer transition-colors">
                 {showPassword ? (
@@ -304,34 +310,34 @@ export default function GoalieDashboard() {
           <div>
             <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Namn</label>
             <input type="text" value={goalieForm.name} onChange={e => setGoalieForm({...goalieForm, name: e.target.value})} required placeholder="T.ex. Rikard"
-              className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+              className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
           </div>
           <div>
             <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">E-post</label>
             <input type="email" value={goalieForm.email} onChange={e => setGoalieForm({...goalieForm, email: e.target.value})} required placeholder="T.ex. namn@exempel.se"
-              className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+              className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
           </div>
           <div>
             <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Telefon</label>
             <input type="tel" value={goalieForm.phone} onChange={e => setGoalieForm({...goalieForm, phone: e.target.value})} placeholder="070-123 45 67"
-              className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+              className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Ort</label>
               <input type="text" value={goalieForm.location} onChange={e => setGoalieForm({...goalieForm, location: e.target.value})} required placeholder="T.ex. Solna"
-                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+                className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
             </div>
             <div>
               <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Region</label>
               <input type="text" value={goalieForm.region} onChange={e => setGoalieForm({...goalieForm, region: e.target.value})} required placeholder="T.ex. Stockholm"
-                className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+                className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
             </div>
           </div>
           <div>
             <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Hemadress (valfritt)</label>
             <input type="text" value={goalieForm.address} onChange={e => setGoalieForm({...goalieForm, address: e.target.value})} placeholder="T.ex. Storgatan 1, 171 45 Solna"
-              className="w-full bg-rink rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
+              className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
             <p className="text-xs text-ice-muted mt-1.5">Används för att visa avstånd till ishallar. Visas aldrig för andra.</p>
           </div>
           <label className="flex items-start gap-3 cursor-pointer">
@@ -437,32 +443,32 @@ export default function GoalieDashboard() {
               <div>
                 <label className="block text-xs text-ice-muted/80 mb-1 uppercase tracking-wider">Namn</label>
                 <input type="text" value={editForm.name || ''} onChange={e => setEditForm({...editForm, name: e.target.value})} required
-                  className="w-full bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm" />
+                  className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
               </div>
               <div>
                 <label className="block text-xs text-ice-muted/80 mb-1 uppercase tracking-wider">E-post</label>
                 <input type="email" value={editForm.email || ''} onChange={e => setEditForm({...editForm, email: e.target.value})} required
-                  className="w-full bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm" />
+                  className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
               </div>
               <div>
                 <label className="block text-xs text-ice-muted/80 mb-1 uppercase tracking-wider">Telefon</label>
                 <input type="tel" value={editForm.phone || ''} onChange={e => setEditForm({...editForm, phone: e.target.value})}
-                  className="w-full bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm" />
+                  className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
               </div>
               <div>
                 <label className="block text-xs text-ice-muted/80 mb-1 uppercase tracking-wider">Ort</label>
                 <input type="text" value={editForm.location || ''} onChange={e => setEditForm({...editForm, location: e.target.value})} required
-                  className="w-full bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm" />
+                  className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
               </div>
               <div>
                 <label className="block text-xs text-ice-muted/80 mb-1 uppercase tracking-wider">Region</label>
                 <input type="text" value={editForm.region || ''} onChange={e => setEditForm({...editForm, region: e.target.value})} required
-                  className="w-full bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm" />
+                  className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
               </div>
               <div>
                 <label className="block text-xs text-ice-muted/80 mb-1 uppercase tracking-wider">Adress</label>
                 <input type="text" value={editForm.address || ''} onChange={e => setEditForm({...editForm, address: e.target.value})}
-                  className="w-full bg-rink rounded border border-rink-border px-3 py-2 text-white text-sm" />
+                  className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
               </div>
               <div className="flex gap-2 pt-2">
                 <button type="submit" className="px-4 py-2 bg-goal-red text-white rounded text-sm font-semibold uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer">Spara</button>

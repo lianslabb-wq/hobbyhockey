@@ -72,22 +72,23 @@ export default function Home() {
           Så här funkar det
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-0 relative">
-          {/* Timeline connector line */}
-          <div className="hidden sm:block absolute top-5 left-[calc(16.67%+12px)] right-[calc(16.67%+12px)] h-0.5 bg-rink-border" />
+          {/* Timeline connector: two red segments between circles */}
+          <div className="hidden sm:block absolute top-5 left-[calc(16.67%+20px)] w-[calc(33.33%-40px)] h-0.5 bg-goal-red" />
+          <div className="hidden sm:block absolute top-5 left-[calc(50%+20px)] w-[calc(33.33%-40px)] h-0.5 bg-goal-red" />
           <div className="relative flex flex-col items-center">
-            <div className="w-10 h-10 rounded-full bg-goal-red/20 border-2 border-goal-red flex items-center justify-center font-display text-lg font-bold text-goal-red mb-3 relative z-10">1</div>
+            <div className="w-10 h-10 rounded-full bg-rink border-2 border-goal-red flex items-center justify-center font-display text-lg font-bold text-goal-red mb-3 relative z-10">1</div>
             <p className="text-sm text-ice-muted leading-relaxed px-4">
               Laget skapar en förfrågan med tid och plats
             </p>
           </div>
           <div className="relative flex flex-col items-center">
-            <div className="w-10 h-10 rounded-full bg-goal-red/20 border-2 border-goal-red flex items-center justify-center font-display text-lg font-bold text-goal-red mb-3 relative z-10">2</div>
+            <div className="w-10 h-10 rounded-full bg-rink border-2 border-goal-red flex items-center justify-center font-display text-lg font-bold text-goal-red mb-3 relative z-10">2</div>
             <p className="text-sm text-ice-muted leading-relaxed px-4">
               Målvakter får en notis och svarar om de kan
             </p>
           </div>
           <div className="relative flex flex-col items-center">
-            <div className="w-10 h-10 rounded-full bg-goal-red/20 border-2 border-goal-red flex items-center justify-center font-display text-lg font-bold text-goal-red mb-3 relative z-10">3</div>
+            <div className="w-10 h-10 rounded-full bg-rink border-2 border-goal-red flex items-center justify-center font-display text-lg font-bold text-goal-red mb-3 relative z-10">3</div>
             <p className="text-sm text-ice-muted leading-relaxed px-4">
               Först till kvarn — bekräftelse skickas direkt
             </p>

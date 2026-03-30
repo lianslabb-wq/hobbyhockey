@@ -266,6 +266,9 @@ export default function MyPage() {
               ) : (
                 <p className="text-ice-muted/60 text-sm mb-6">Ingen historik ännu.</p>
               )}
+
+              <h4 className="text-xs text-ice-muted/80 uppercase tracking-wider mb-2 font-semibold">Favoritlag (0)</h4>
+              <p className="text-ice-muted/60 text-sm mb-6">Inga favoritlag tillagda ännu.</p>
             </>
           ) : (
             <Link to="/goalie" className="bg-rink-light border border-rink-border border-dashed rounded-lg p-6 no-underline hover:border-jersey-blue/40 transition-colors text-center block">

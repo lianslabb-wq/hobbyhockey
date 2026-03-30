@@ -92,22 +92,28 @@ export default function TeamDashboard() {
 
   async function loadRequests() {
     const { data } = await supabase.from('requests').select('*, responses(*)').eq('team_id', team.id).order('created_at', { ascending: false })
-    // Get goalie names from safe directory
+    // Get goalie info - names for all, contact details for those who said yes
     const goalieIds = [...new Set((data || []).flatMap(r =>
       (r.responses || []).map(resp => resp.goalie_id)
     ).filter(Boolean))]
-    let goalieNames = {}
+    let goalieInfo = {}
     if (goalieIds.length > 0) {
-      const { data: gd } = await supabase.from('goalie_directory').select('id, name').in('id', goalieIds)
-      goalieNames = Object.fromEntries((gd || []).map(g => [g.id, g.name]))
+      // Get full goalie data (RLS allows public read)
+      const { data: gd } = await supabase.from('goalies').select('id, name, email, phone').in('id', goalieIds)
+      goalieInfo = Object.fromEntries((gd || []).map(g => [g.id, g]))
     }
-    // Attach safe goalie names to responses
+    // Attach goalie info to responses - include contact for those who said yes
     setRequests((data || []).map(req => ({
       ...req,
-      responses: (req.responses || []).map(r => ({
-        ...r,
-        goalies: { name: goalieNames[r.goalie_id] || 'Okänd' }
-      }))
+      responses: (req.responses || []).map(r => {
+        const gi = goalieInfo[r.goalie_id]
+        return {
+          ...r,
+          goalies: { name: gi?.name || 'Okänd' },
+          goalieEmail: r.answer === 'yes' ? gi?.email : null,
+          goaliePhone: r.answer === 'yes' ? gi?.phone : null,
+        }
+      })
     })))
   }
 
@@ -613,6 +619,8 @@ export default function TeamDashboard() {
                   responses: (req.responses || []).map(r => ({
                     goalieId: r.goalie_id,
                     goalieName: r.goalies?.name || 'Okänd',
+                    goalieEmail: r.goalieEmail,
+                    goaliePhone: r.goaliePhone,
                     answer: r.answer,
                   })),
                 }

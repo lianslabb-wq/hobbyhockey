@@ -69,10 +69,34 @@ export default function RequestCard({ request, session, team: teamProp, onRespon
         <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-rink-border">
           <p className="text-xs text-ice-muted mb-2 uppercase tracking-wide font-semibold">Svar ({request.responses?.length || 0})</p>
           {request.responses?.length > 0 ? request.responses.map((r, i) => (
-            <div key={i} className="flex items-center gap-2 text-sm">
-              <span className={`w-2 h-2 rounded-full ${r.answer === 'yes' ? 'bg-goal-green' : 'bg-goal-red'}`} />
-              <span className="text-white font-medium">{r.goalieName}</span>
-              <span className="text-ice-muted">{r.answer === 'yes' ? 'Tillgänglig' : 'Kan inte'}</span>
+            <div key={i} className={`text-sm ${r.answer === 'yes' ? 'bg-goal-green/10 border border-goal-green/30 rounded-lg p-3 mb-2' : 'flex items-center gap-2 mb-1'}`}>
+              {r.answer === 'yes' ? (
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="w-2 h-2 rounded-full bg-goal-green" />
+                    <span className="text-white font-semibold">{r.goalieName}</span>
+                    <span className="text-goal-green text-xs font-semibold uppercase">Accepterad</span>
+                  </div>
+                  {r.goalieEmail && (
+                    <div className="ml-4 space-y-0.5">
+                      <p className="text-ice-muted">
+                        <a href={`mailto:${r.goalieEmail}`} className="text-jersey-blue hover:text-jersey-blue-light no-underline">{r.goalieEmail}</a>
+                      </p>
+                      {r.goaliePhone && (
+                        <p className="text-ice-muted">
+                          <a href={`tel:${r.goaliePhone}`} className="text-jersey-blue hover:text-jersey-blue-light no-underline">{r.goaliePhone}</a>
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <span className="w-2 h-2 rounded-full bg-goal-red" />
+                  <span className="text-white font-medium">{r.goalieName}</span>
+                  <span className="text-ice-muted">Kan inte</span>
+                </>
+              )}
             </div>
           )) : (
             <p className="text-ice-muted text-sm">Inga svar ännu</p>

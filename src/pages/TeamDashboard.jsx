@@ -14,6 +14,7 @@ export default function TeamDashboard() {
   const [newRequest, setNewRequest] = useState({ sessionId: '', type: 'open' })
   const [allGoalies, setAllGoalies] = useState([])
   const [goalieSearch, setGoalieSearch] = useState('')
+  const [goalieInfo, setGoalieInfo] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [successMsg, setSuccessMsg] = useState('')
@@ -96,22 +97,22 @@ export default function TeamDashboard() {
     const goalieIds = [...new Set((data || []).flatMap(r =>
       (r.responses || []).map(resp => resp.goalie_id)
     ).filter(Boolean))]
-    let goalieInfo = {}
+    let gi = {}
     if (goalieIds.length > 0) {
-      // Get full goalie data (RLS allows public read)
       const { data: gd } = await supabase.from('goalies').select('id, name, email, phone').in('id', goalieIds)
-      goalieInfo = Object.fromEntries((gd || []).map(g => [g.id, g]))
+      gi = Object.fromEntries((gd || []).map(g => [g.id, g]))
     }
+    setGoalieInfo(gi)
     // Attach goalie info to responses - include contact for those who said yes
     setRequests((data || []).map(req => ({
       ...req,
       responses: (req.responses || []).map(r => {
-        const gi = goalieInfo[r.goalie_id]
+        const g = gi[r.goalie_id]
         return {
           ...r,
-          goalies: { name: gi?.name || 'Okänd' },
-          goalieEmail: r.answer === 'yes' ? gi?.email : null,
-          goaliePhone: r.answer === 'yes' ? gi?.phone : null,
+          goalies: { name: g?.name || 'Okänd' },
+          goalieEmail: r.answer === 'yes' ? g?.email : null,
+          goaliePhone: r.answer === 'yes' ? g?.phone : null,
         }
       })
     })))
@@ -531,108 +532,78 @@ export default function TeamDashboard() {
         </form>
       )}
 
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
-          <h1 className="font-display text-3xl font-bold uppercase tracking-tight">{team.name}</h1>
-          <p className="text-ice-muted">{team.type} &middot; {team.location} &middot; Ansvarig: {team.contact_name}</p>
+          <h1 className="font-display text-2xl sm:text-3xl font-bold uppercase tracking-tight">{team.name}</h1>
+          <p className="text-ice-muted text-sm">{team.type} &middot; {team.location} &middot; {team.contact_name}</p>
         </div>
-        <div className="flex gap-2">
-          <button onClick={() => setShowNewRequest(!showNewRequest)}
-            className="px-5 py-2.5 bg-goal-red text-white rounded font-semibold text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer">
-            + Sök målvakt
-          </button>
-          <button onClick={() => { setEditForm({...team}); setEditing(!editing) }}
-            className="px-4 py-2.5 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
-            Redigera
-          </button>
-        </div>
+        <button onClick={() => { setEditForm({...team}); setEditing(!editing) }}
+          className="px-4 py-2.5 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer self-start">
+          Redigera
+        </button>
       </div>
-
-      {showNewRequest && (
-        <div className="bg-rink-light border border-goal-red/30 rounded-lg p-6 mb-6">
-          <h3 className="font-display text-lg font-bold uppercase tracking-wide mb-4">Ny förfrågan</h3>
-          {sessionsNeedingGoalie.length === 0 ? (
-            <p className="text-ice-muted">Lägg till en tid först (se "Lägg till tid" nedan).</p>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-xs text-ice-muted mb-1.5 uppercase tracking-wider">Tillfälle</label>
-                  <select value={newRequest.sessionId} onChange={e => setNewRequest({...newRequest, sessionId: e.target.value})}
-                    className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm">
-                    <option value="">Välj tillfälle...</option>
-                    {sessionsNeedingGoalie.map(s => (
-                      <option key={s.id} value={s.id}>{s.date} {s.time?.slice(0, 5)} — {s.type} @ {s.rink}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs text-ice-muted mb-1.5 uppercase tracking-wider">Skicka till</label>
-                  <select value={newRequest.type} onChange={e => setNewRequest({...newRequest, type: e.target.value})}
-                    className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm">
-                    <option value="favorites">Mina favoriter ({favorites.length} st)</option>
-                    <option value="open">Alla målvakter (öppen förfrågan)</option>
-                  </select>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <button onClick={handleCreateRequest}
-                  className="px-5 py-2.5 bg-goal-red text-white rounded font-semibold text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer">
-                  Skicka förfrågan
-                </button>
-                <button onClick={() => setShowNewRequest(false)}
-                  className="px-5 py-2.5 bg-rink-lighter text-ice-muted rounded font-semibold text-sm uppercase tracking-wider hover:text-white transition-colors cursor-pointer">
-                  Avbryt
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Kommande tider</h2>
+          <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Tider ({sessions.length})</h2>
           {sessions.length === 0 ? (
-            <p className="text-ice-muted">Inga tider tillagda.</p>
+            <p className="text-ice-muted">Inga tider tillagda. Lägg till din första tid till höger.</p>
           ) : (
-            <div className="space-y-2 mb-8">
-              {sessions.map(s => (
-                <div key={s.id} className={`rounded-lg p-4 text-sm border ${s.needs_goalie ? 'bg-goal-red/10 border-goal-red/30' : 'bg-rink-light border-rink-border'}`}>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-white">{s.date} {s.time?.slice(0, 5)}</p>
-                      <p className="text-ice-muted">{s.type} @ {s.rink}</p>
-                      {s.rink_address && <p className="text-ice-muted text-xs">{s.rink_address}</p>}
-                    </div>
-                    {s.needs_goalie && <span className="text-goal-red text-xs font-semibold uppercase tracking-wider">Saknar målvakt</span>}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+            <div className="space-y-3">
+              {sessions.map(s => {
+                const req = requests.find(r => r.session_id === s.id)
+                const yesResponses = (req?.responses || []).filter(r => r.answer === 'yes')
+                const allResponses = req?.responses || []
+                const isFilled = req?.status === 'filled' || yesResponses.length > 0
 
-          <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Förfrågningar</h2>
-          {requests.length === 0 ? (
-            <p className="text-ice-muted">Inga aktiva förfrågningar.</p>
-          ) : (
-            <div className="space-y-4">
-              {requests.map(req => {
-                const session = sessions.find(s => s.id === req.session_id)
-                if (!session) return null
-                const mapped = {
-                  ...req,
-                  teamId: req.team_id,
-                  sessionId: req.session_id,
-                  responses: (req.responses || []).map(r => ({
-                    goalieId: r.goalie_id,
-                    goalieName: r.goalies?.name || 'Okänd',
-                    goalieEmail: r.goalieEmail,
-                    goaliePhone: r.goaliePhone,
-                    answer: r.answer,
-                  })),
-                }
-                return <RequestCard key={req.id} request={mapped} session={session} isGoalieView={false} />
+                return (
+                  <div key={s.id} className={`rounded-lg p-4 text-sm border ${
+                    isFilled ? 'bg-goal-green/10 border-goal-green/30' : 'bg-rink-light border-rink-border'
+                  }`}>
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="font-semibold text-white">{s.date} {s.time?.slice(0, 5)}</p>
+                        <p className="text-ice-muted">{s.type} @ {s.rink}</p>
+                        {s.rink_address && <p className="text-ice-muted text-xs">{s.rink_address}</p>}
+                      </div>
+                      <span className={`text-xs font-semibold uppercase tracking-wider shrink-0 ${
+                        isFilled ? 'text-goal-green' : 'text-goal-red'
+                      }`}>
+                        {isFilled ? 'Tillsatt' : 'Söker målvakt'}
+                      </span>
+                    </div>
+                    {/* Show accepted goalie with contact info */}
+                    {yesResponses.length > 0 && (
+                      <div className="mt-3 pt-3 border-t border-goal-green/20">
+                        {yesResponses.map((r, i) => {
+                          const gi = goalieInfo[r.goalie_id]
+                          return (
+                            <div key={i} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                              <div className="flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-goal-green" />
+                                <span className="text-white font-semibold">{r.goalies?.name || gi?.name || 'Okänd'}</span>
+                              </div>
+                              {(r.goalieEmail || gi?.email) && (
+                                <div className="flex gap-3 ml-4 sm:ml-0">
+                                  <a href={`mailto:${r.goalieEmail || gi?.email}`} className="text-jersey-blue hover:text-jersey-blue-light text-sm no-underline">{r.goalieEmail || gi?.email}</a>
+                                  {(r.goaliePhone || gi?.phone) && (
+                                    <a href={`tel:${r.goaliePhone || gi?.phone}`} className="text-jersey-blue hover:text-jersey-blue-light text-sm no-underline">{r.goaliePhone || gi?.phone}</a>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+                    {/* Show response count if searching */}
+                    {!isFilled && req && (
+                      <div className="mt-2 pt-2 border-t border-rink-border">
+                        <p className="text-ice-muted text-xs">Svar: {allResponses.length} — {allResponses.length === 0 ? 'Väntar på svar' : `${yesResponses.length} ja, ${allResponses.length - yesResponses.length} nej`}</p>
+                      </div>
+                    )}
+                  </div>
+                )
               })}
             </div>
           )}

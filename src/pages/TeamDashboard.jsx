@@ -478,7 +478,10 @@ export default function TeamDashboard() {
   }
 
   // Team dashboard
+  const [showAllSessions, setShowAllSessions] = useState(false)
   const sessionsNeedingGoalie = sessions.filter(s => s.needs_goalie)
+  const visibleSessions = showAllSessions ? sessions : sessions.slice(0, 3)
+  const hiddenCount = sessions.length - 3
 
   return (
     <div>
@@ -550,7 +553,7 @@ export default function TeamDashboard() {
             <p className="text-ice-muted">Inga tider tillagda. Lägg till din första tid till höger.</p>
           ) : (
             <div className="space-y-3">
-              {sessions.map(s => {
+              {visibleSessions.map(s => {
                 const req = requests.find(r => r.session_id === s.id)
                 const yesResponses = (req?.responses || []).filter(r => r.answer === 'yes')
                 const allResponses = req?.responses || []
@@ -605,6 +608,18 @@ export default function TeamDashboard() {
                   </div>
                 )
               })}
+              {!showAllSessions && hiddenCount > 0 && (
+                <button onClick={() => setShowAllSessions(true)}
+                  className="w-full py-3 bg-rink-lighter text-ice-muted rounded-lg text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer border border-rink-border">
+                  Visa {hiddenCount} fler tider
+                </button>
+              )}
+              {showAllSessions && sessions.length > 3 && (
+                <button onClick={() => setShowAllSessions(false)}
+                  className="w-full py-3 bg-rink-lighter text-ice-muted rounded-lg text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer border border-rink-border">
+                  Visa färre
+                </button>
+              )}
             </div>
           )}
         </div>

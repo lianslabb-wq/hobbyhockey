@@ -26,10 +26,14 @@ export default function GoalieDashboard() {
   const [changingPassword, setChangingPassword] = useState(false)
   const [newPassword, setNewPassword] = useState('')
   const [passwordMsg, setPasswordMsg] = useState('')
+  const [goalieFavorites, setGoalieFavorites] = useState([])
+  const [teamsWhoFavoritedMe, setTeamsWhoFavoritedMe] = useState([])
+  const [allTeams, setAllTeams] = useState([])
+  const [teamSearch, setTeamSearch] = useState('')
 
   // Goalie registration form
   const [goalieForm, setGoalieForm] = useState({
-    name: '', email: '', phone: '', location: '', region: '', address: ''
+    name: '', email: '', phone: '', location: '', region: ''
   })
 
   useEffect(() => {
@@ -72,16 +76,46 @@ export default function GoalieDashboard() {
   }
 
   async function loadRequests() {
-    // Load all open requests with team and session info
+    // Load all requests (not just open) so we can show history
     const { data: allRequests } = await supabase
       .from('requests')
       .select('*, teams(*), sessions(*), responses(*)')
-      .eq('status', 'open')
       .order('created_at', { ascending: false })
     setRequests(allRequests || [])
 
-    const { data: allTeams } = await supabase.from('teams').select('*')
-    setTeams(allTeams || [])
+    const { data: allTeamsData } = await supabase.from('teams').select('id, name, location, type')
+    setAllTeams(allTeamsData || [])
+
+    // Load teams who have me as favorite
+    if (goalie) {
+      const { data: favData } = await supabase.from('favorites').select('team_id').eq('goalie_id', goalie.id)
+      if (favData?.length > 0) {
+        const teamIds = favData.map(f => f.team_id)
+        const favTeams = (allTeamsData || []).filter(t => teamIds.includes(t.id))
+        setTeamsWhoFavoritedMe(favTeams)
+      }
+
+      // Load my favorite teams
+      const { data: myFavs } = await supabase.from('goalie_favorites').select('id, team_id').eq('goalie_id', goalie.id).catch(() => ({ data: [] }))
+      if (myFavs?.length > 0) {
+        const myFavTeams = myFavs.map(f => ({
+          ...f,
+          team: (allTeamsData || []).find(t => t.id === f.team_id)
+        }))
+        setGoalieFavorites(myFavTeams)
+      }
+    }
+  }
+
+  async function addFavoriteTeam(teamId) {
+    if (!goalie) return
+    const { error: err } = await supabase.from('goalie_favorites').insert({ goalie_id: goalie.id, team_id: teamId })
+    if (!err) { setTeamSearch(''); loadRequests() }
+  }
+
+  async function removeFavoriteTeam(favId) {
+    await supabase.from('goalie_favorites').delete().eq('id', favId)
+    loadRequests()
   }
 
   async function handleAuth(e) {
@@ -110,7 +144,6 @@ export default function GoalieDashboard() {
         phone: goalieForm.phone || null,
         location: goalieForm.location,
         region: goalieForm.region,
-        address: goalieForm.address || null,
         available: true,
         user_id: user.id,
         privacy_consent: true,
@@ -182,7 +215,6 @@ export default function GoalieDashboard() {
       phone: editForm.phone || null,
       location: editForm.location,
       region: editForm.region,
-      address: editForm.address || null,
     }).eq('id', goalie.id)
     if (err) { setError('Kunde inte uppdatera. Försök igen.'); return }
     setGoalie({ ...goalie, ...editForm })
@@ -359,12 +391,6 @@ export default function GoalieDashboard() {
                 className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
             </div>
           </div>
-          <div>
-            <label className="block text-xs text-ice-muted/80 mb-1.5 uppercase tracking-wider">Hemadress (valfritt)</label>
-            <input type="text" value={goalieForm.address} onChange={e => setGoalieForm({...goalieForm, address: e.target.value})} placeholder="T.ex. Storgatan 1, 171 45 Solna"
-              className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2.5 text-white text-sm" />
-            <p className="text-xs text-ice-muted mt-1.5">Används för att visa avstånd till ishallar. Visas aldrig för andra.</p>
-          </div>
           <label className="flex items-start gap-3 cursor-pointer">
             <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)}
               className="mt-1 w-4 h-4 rounded border-rink-border accent-goal-red cursor-pointer" />
@@ -536,11 +562,6 @@ export default function GoalieDashboard() {
                 <input type="text" value={editForm.region || ''} onChange={e => setEditForm({...editForm, region: e.target.value})} required
                   className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
               </div>
-              <div>
-                <label className="block text-xs text-ice-muted/80 mb-1 uppercase tracking-wider">Adress</label>
-                <input type="text" value={editForm.address || ''} onChange={e => setEditForm({...editForm, address: e.target.value})}
-                  className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm" />
-              </div>
               <div className="flex gap-2 pt-2">
                 <button type="submit" className="px-4 py-2 bg-goal-red text-white rounded text-sm font-semibold uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer">Spara</button>
                 <button type="button" onClick={() => setEditing(false)} className="px-4 py-2 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer">Avbryt</button>
@@ -566,12 +587,6 @@ export default function GoalieDashboard() {
                 <p className="text-xs text-ice-muted/80 uppercase tracking-wider">Plats</p>
                 <p className="font-semibold text-white">{goalie.location}, {goalie.region}</p>
               </div>
-              {goalie.address && (
-                <div>
-                  <p className="text-xs text-ice-muted/80 uppercase tracking-wider">Adress</p>
-                  <p className="font-semibold text-white">{goalie.address}</p>
-                </div>
-              )}
               <div className="flex items-center gap-2 pt-1">
                 <span className={`w-2.5 h-2.5 rounded-full ${goalie.available ? 'bg-goal-green' : 'bg-goal-red'}`} />
                 <span className="text-sm font-medium">{goalie.available ? 'Tillgänglig' : 'Inte tillgänglig'}</span>
@@ -582,6 +597,76 @@ export default function GoalieDashboard() {
               </button>
             </div>
           )}
+
+          {/* Favoritmålvakt hos */}
+          {teamsWhoFavoritedMe.length > 0 && (
+            <div className="mt-6">
+              <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-3">Favoritmålvakt hos ({teamsWhoFavoritedMe.length})</h2>
+              <div className="space-y-2">
+                {teamsWhoFavoritedMe.map(t => (
+                  <div key={t.id} className="bg-goal-green/10 border border-goal-green/30 rounded-lg p-3 flex items-center gap-2 text-sm">
+                    <span className="w-2 h-2 rounded-full bg-goal-green" />
+                    <span className="text-white font-semibold">{t.name}</span>
+                    <span className="text-ice-muted">{t.location}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Mina favoritlag */}
+          <div className="mt-6">
+            <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-3">Mina favoritlag ({goalieFavorites.length})</h2>
+            {goalieFavorites.length > 0 ? (
+              <div className="space-y-2">
+                {goalieFavorites.map(f => (
+                  <div key={f.id} className="bg-rink-light border border-rink-border rounded-lg p-3 flex items-center justify-between text-sm">
+                    <div>
+                      <p className="font-semibold text-white">{f.team?.name}</p>
+                      <p className="text-ice-muted text-xs">{f.team?.location}</p>
+                    </div>
+                    <button onClick={() => removeFavoriteTeam(f.id)}
+                      className="text-ice-muted/70 hover:text-goal-red text-xs uppercase tracking-wider bg-transparent border-none cursor-pointer transition-colors">
+                      Ta bort
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-ice-muted/60 text-sm mb-2">Inga favoritlag tillagda. Sök och lägg till nedan.</p>
+            )}
+            <div className="mt-3">
+              <input
+                type="text"
+                value={teamSearch}
+                onChange={e => setTeamSearch(e.target.value)}
+                placeholder="Sök lag..."
+                className="w-full bg-rink-lighter rounded border border-rink-border px-3 py-2 text-white text-sm"
+              />
+              {teamSearch.length >= 2 && (() => {
+                const favTeamIds = goalieFavorites.map(f => f.team_id)
+                const filtered = allTeams.filter(t =>
+                  !favTeamIds.includes(t.id) &&
+                  t.name.toLowerCase().includes(teamSearch.toLowerCase())
+                )
+                if (filtered.length === 0) return <p className="text-ice-muted/70 text-xs mt-2">Inga träffar.</p>
+                return (
+                  <div className="mt-2 space-y-1">
+                    {filtered.map(t => (
+                      <button key={t.id} onClick={() => addFavoriteTeam(t.id)}
+                        className="w-full text-left bg-rink-light border border-rink-border rounded px-3 py-2 text-sm hover:border-jersey-blue/60 transition-colors cursor-pointer flex items-center justify-between">
+                        <span>
+                          <span className="text-white font-semibold">{t.name}</span>
+                          <span className="text-ice-muted ml-2">{t.location}</span>
+                        </span>
+                        <span className="text-jersey-blue text-xs uppercase tracking-wider">+ Lägg till</span>
+                      </button>
+                    ))}
+                  </div>
+                )
+              })()}
+            </div>
+          </div>
 
           <div className="mt-8 border-t border-rink-border pt-6">
             <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Hantera konto</h2>

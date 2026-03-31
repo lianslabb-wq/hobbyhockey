@@ -232,6 +232,7 @@ export default function Admin() {
     { key: 'teams', label: `Lag (${teams.length})` },
     { key: 'goalies', label: `Målvakter (${goalies.length})` },
     { key: 'requests', label: `Förfrågningar (${requests.length})` },
+    { key: 'analytics', label: 'Dataanalys' },
     { key: 'support', label: `Stöd (${supportCount})` },
   ]
 
@@ -473,6 +474,51 @@ export default function Admin() {
             </div>
           ))}
           {requests.length === 0 && <p className="text-ice-muted">Inga förfrågningar.</p>}
+        </div>
+      )}
+
+      {tab === 'analytics' && (
+        <div>
+          <a
+            href="https://cloud.umami.is"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block px-6 py-3 bg-jersey-blue text-puck rounded text-sm font-semibold uppercase tracking-wider hover:bg-jersey-blue-light transition-colors no-underline mb-8"
+          >
+            Öppna Umami Dashboard →
+          </a>
+
+          <div className="bg-rink-light border border-rink-border rounded-lg p-5 mb-6">
+            <h3 className="font-display text-sm font-bold uppercase tracking-wider mb-4 text-white">Vad ska jag titta på?</h3>
+            <div className="space-y-4 text-sm">
+              <div>
+                <p className="text-white font-semibold mb-1">1. Besökare per vecka — växer vi?</p>
+                <p className="text-ice-muted">0-10: Sprid länken mer. 10-50: Bra start. 50+: Appen har dragkraft.</p>
+              </div>
+              <div>
+                <p className="text-white font-semibold mb-1">2. Vilka sidor besöks mest?</p>
+                <p className="text-ice-muted">Många på Hem men få på /team? Startsidan övertygar inte. Många på /team men få på /goalie? Målvakterna hittar inte dit.</p>
+              </div>
+              <div>
+                <p className="text-white font-semibold mb-1">3. Mobil vs desktop</p>
+                <p className="text-ice-muted">Om 80% är mobil — bra, vi har byggt mobile-first. Om 80% desktop — folk delar nog länken via dator.</p>
+              </div>
+              <div>
+                <p className="text-white font-semibold mb-1">4. Referrers — var kommer folk ifrån?</p>
+                <p className="text-ice-muted">Direkt = de har länken. Google = folk söker. Instagram/Facebook = sociala medier funkar.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-rink-light border border-rink-border rounded-lg p-5">
+            <h3 className="font-display text-sm font-bold uppercase tracking-wider mb-4 text-white">Veckorutin</h3>
+            <div className="space-y-2 text-sm text-ice-muted">
+              <p>1. Logga in på Umami en gång i veckan</p>
+              <p>2. Kolla antal besökare — trend uppåt eller ner?</p>
+              <p>3. Kolla populäraste sidorna — matchar det vad vi vill?</p>
+              <p>4. Notera om något sticker ut — t.ex. plötslig ökning eller tapp</p>
+            </div>
+          </div>
         </div>
       )}
 

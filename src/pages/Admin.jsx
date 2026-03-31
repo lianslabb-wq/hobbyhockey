@@ -10,7 +10,7 @@ export default function Admin() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [tab, setTab] = useState('teams')
+  const [tab, setTab] = useState('dashboard')
   const [editingItem, setEditingItem] = useState(null)
   const [editForm, setEditForm] = useState({})
 
@@ -19,6 +19,9 @@ export default function Admin() {
   const [requests, setRequests] = useState([])
   const [supportClicks, setSupportClicks] = useState([])
   const [supportCount, setSupportCount] = useState(0)
+  const [sessions, setSessions] = useState([])
+  const [responses, setResponses] = useState([])
+  const [favorites, setFavorites] = useState([])
 
   useEffect(() => {
     checkUser()
@@ -49,17 +52,23 @@ export default function Admin() {
   }
 
   async function loadAll() {
-    const [t, g, r, s] = await Promise.all([
+    const [t, g, r, s, sess, resp, fav] = await Promise.all([
       supabase.from('teams').select('*').order('created_at', { ascending: false }),
       supabase.from('goalies').select('*').order('created_at', { ascending: false }),
       supabase.from('requests').select('*, teams(name), sessions(date, time, rink), responses(count)').order('created_at', { ascending: false }),
       supabase.from('support_clicks').select('*').order('created_at', { ascending: false }),
+      supabase.from('sessions').select('*'),
+      supabase.from('responses').select('*'),
+      supabase.from('favorites').select('*'),
     ])
     setTeams(t.data || [])
     setGoalies(g.data || [])
     setRequests(r.data || [])
     setSupportClicks(s.data || [])
     setSupportCount(s.data?.length || 0)
+    setSessions(sess.data || [])
+    setResponses(resp.data || [])
+    setFavorites(fav.data || [])
   }
 
   const [successMsg, setSuccessMsg] = useState('')
@@ -205,7 +214,21 @@ export default function Admin() {
     )
   }
 
+  const today = new Date().toISOString().split('T')[0]
+  const openRequests = requests.filter(r => r.status === 'open')
+  const filledRequests = requests.filter(r => r.status === 'filled')
+  const availableGoalies = goalies.filter(g => g.available)
+  const upcomingSessions = sessions.filter(s => s.date >= today)
+  const pastSessions = sessions.filter(s => s.date < today)
+
+  // Activity last 7 days
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+  const newTeamsThisWeek = teams.filter(t => t.created_at >= weekAgo)
+  const newGoaliesThisWeek = goalies.filter(g => g.created_at >= weekAgo)
+  const newResponsesThisWeek = responses.filter(r => r.created_at >= weekAgo)
+
   const tabs = [
+    { key: 'dashboard', label: 'Dashboard' },
     { key: 'teams', label: `Lag (${teams.length})` },
     { key: 'goalies', label: `Målvakter (${goalies.length})` },
     { key: 'requests', label: `Förfrågningar (${requests.length})` },
@@ -233,6 +256,96 @@ export default function Admin() {
           </button>
         ))}
       </div>
+
+      {tab === 'dashboard' && (
+        <div>
+          {/* Key metrics */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+            <div className="bg-rink-light border border-rink-border rounded-lg p-4 text-center">
+              <p className="font-display text-2xl sm:text-3xl font-bold text-white">{teams.length}</p>
+              <p className="text-ice-muted text-xs uppercase tracking-wider font-semibold">Lag</p>
+            </div>
+            <div className="bg-rink-light border border-rink-border rounded-lg p-4 text-center">
+              <p className="font-display text-2xl sm:text-3xl font-bold text-white">{goalies.length}</p>
+              <p className="text-ice-muted text-xs uppercase tracking-wider font-semibold">Målvakter</p>
+            </div>
+            <div className="bg-rink-light border border-rink-border rounded-lg p-4 text-center">
+              <p className="font-display text-2xl sm:text-3xl font-bold text-goal-red">{openRequests.length}</p>
+              <p className="text-ice-muted text-xs uppercase tracking-wider font-semibold">Söker målvakt</p>
+            </div>
+            <div className="bg-rink-light border border-rink-border rounded-lg p-4 text-center">
+              <p className="font-display text-2xl sm:text-3xl font-bold text-goal-green">{filledRequests.length}</p>
+              <p className="text-ice-muted text-xs uppercase tracking-wider font-semibold">Tillsatta</p>
+            </div>
+          </div>
+
+          {/* Detailed stats */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+            <div className="bg-rink-light border border-rink-border rounded-lg p-5">
+              <h3 className="font-display text-sm font-bold uppercase tracking-wider mb-4 text-ice-muted">Översikt</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-ice-muted">Kommande tider</span>
+                  <span className="text-white font-semibold">{upcomingSessions.length}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-ice-muted">Passerade tider</span>
+                  <span className="text-white font-semibold">{pastSessions.length}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-ice-muted">Totalt svar från målvakter</span>
+                  <span className="text-white font-semibold">{responses.length}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-ice-muted">Favorit-kopplingar (lag→målvakt)</span>
+                  <span className="text-white font-semibold">{favorites.length}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-ice-muted">Tillgängliga målvakter</span>
+                  <span className="text-goal-green font-semibold">{availableGoalies.length} av {goalies.length}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-rink-light border border-rink-border rounded-lg p-5">
+              <h3 className="font-display text-sm font-bold uppercase tracking-wider mb-4 text-ice-muted">Senaste 7 dagarna</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-ice-muted">Nya lag</span>
+                  <span className={`font-semibold ${newTeamsThisWeek.length > 0 ? 'text-goal-green' : 'text-white'}`}>{newTeamsThisWeek.length}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-ice-muted">Nya målvakter</span>
+                  <span className={`font-semibold ${newGoaliesThisWeek.length > 0 ? 'text-goal-green' : 'text-white'}`}>{newGoaliesThisWeek.length}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-ice-muted">Nya svar</span>
+                  <span className={`font-semibold ${newResponsesThisWeek.length > 0 ? 'text-goal-green' : 'text-white'}`}>{newResponsesThisWeek.length}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Recent activity */}
+          <h3 className="font-display text-sm font-bold uppercase tracking-wider mb-3 text-ice-muted">Senaste registreringar</h3>
+          <div className="space-y-2">
+            {[...teams.map(t => ({ type: 'lag', name: t.name, location: t.location, date: t.created_at })),
+              ...goalies.map(g => ({ type: 'målvakt', name: g.name, location: g.location, date: g.created_at }))
+            ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 8).map((item, i) => (
+              <div key={i} className="bg-rink-light border border-rink-border rounded-lg p-3 flex items-center justify-between text-sm">
+                <div className="flex items-center gap-2">
+                  <span className={`px-2 py-0.5 rounded text-xs font-semibold uppercase ${item.type === 'lag' ? 'bg-jersey-blue/20 text-jersey-blue' : 'bg-goal-green/20 text-goal-green'}`}>
+                    {item.type}
+                  </span>
+                  <span className="text-white font-medium">{item.name}</span>
+                  <span className="text-ice-muted">{item.location}</span>
+                </div>
+                <span className="text-ice-muted text-xs">{new Date(item.date).toLocaleDateString('sv-SE')}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {tab === 'teams' && (
         <div className="space-y-3">

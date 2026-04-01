@@ -13,6 +13,7 @@ export default function MyPage() {
   const [goalieRequests, setGoalieRequests] = useState([])
   const [favorites, setFavorites] = useState([])
   const [goalieFavorites, setGoalieFavorites] = useState([])
+  const [confirmedGoalieNames, setConfirmedGoalieNames] = useState({})
   const [loading, setLoading] = useState(true)
 
   const today = new Date().toISOString().split('T')[0]
@@ -41,6 +42,15 @@ export default function MyPage() {
         ])
         setSessions(sessRes.data || [])
         setTeamRequests(reqRes.data || [])
+        // Load goalie names for confirmed requests
+        const yesGoalieIds = [...new Set((reqRes.data || []).flatMap(r =>
+          (r.responses || []).filter(resp => resp.answer === 'yes').map(resp => resp.goalie_id)
+        ).filter(Boolean))]
+        if (yesGoalieIds.length > 0) {
+          const { data: gNames } = await supabase.from('goalie_directory').select('*').in('id', yesGoalieIds)
+          setConfirmedGoalieNames(Object.fromEntries((gNames || []).map(g => [g.id, g.name])))
+        }
+
         // Load goalie names for favorites
         if (favRes.data?.length > 0) {
           const goalieIds = favRes.data.map(f => f.goalie_id)
@@ -80,6 +90,10 @@ export default function MyPage() {
   const upcomingSessions = sessions.filter(s => s.date >= today)
   const pastSessions = sessions.filter(s => s.date < today)
   const openTeamRequests = teamRequests.filter(r => r.status === 'open')
+  // Team: requests with confirmed goalies (has yes-response)
+  const confirmedTeamRequests = teamRequests.filter(r =>
+    r.responses?.some(resp => resp.answer === 'yes')
+  )
 
   // Goalie: requests I responded "yes" to
   const acceptedRequests = goalieRequests.filter(r =>
@@ -129,6 +143,37 @@ export default function MyPage() {
               </Link>
 
               <h3 className="font-display text-lg font-bold uppercase tracking-wider mb-3">Lagtider</h3>
+
+              {confirmedTeamRequests.filter(r => r.sessions?.date >= today).length > 0 && (
+                <>
+                  <h4 className="text-xs text-goal-green uppercase tracking-wider mb-2 font-semibold">Bekräftade matchningar ({confirmedTeamRequests.filter(r => r.sessions?.date >= today).length})</h4>
+                  <div className="space-y-2 mb-6">
+                    {confirmedTeamRequests.filter(r => r.sessions?.date >= today).map(r => {
+                      const yesResp = r.responses?.find(resp => resp.answer === 'yes')
+                      const goalieName = yesResp ? confirmedGoalieNames[yesResp.goalie_id] : null
+                      return (
+                        <div key={r.id} className="bg-goal-green/10 border border-goal-green/30 rounded-lg p-4 text-sm">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="bg-goal-green/20 text-goal-green px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider">Bekräftad</span>
+                          </div>
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <p className="font-semibold text-white">{r.sessions?.date} {r.sessions?.time?.slice(0, 5)}</p>
+                              <p className="text-ice-muted">{r.sessions?.type} @ {r.sessions?.rink}</p>
+                            </div>
+                            <div className="text-right">
+                              <div className="flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-goal-green" />
+                                <span className="text-white font-semibold">{goalieName || 'Målvakt'}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </>
+              )}
 
               <h4 className="text-xs text-ice-muted uppercase tracking-wider mb-2 font-semibold">Kommande tider ({upcomingSessions.length})</h4>
               {upcomingSessions.length > 0 ? (
@@ -220,26 +265,29 @@ export default function MyPage() {
 
               <h3 className="font-display text-lg font-bold uppercase tracking-wider mb-3">Målvaktstider</h3>
 
-              <h4 className="text-xs text-ice-muted uppercase tracking-wider mb-2 font-semibold">Bokade kommande ({upcomingGoalieGigs.length})</h4>
+              <h4 className="text-xs text-goal-green uppercase tracking-wider mb-2 font-semibold">Bekräftade speltider ({upcomingGoalieGigs.length})</h4>
               {upcomingGoalieGigs.length > 0 ? (
                 <div className="space-y-2 mb-6">
                   {upcomingGoalieGigs.map(r => (
-                    <div key={r.id} className="bg-goal-green/10 border border-goal-green/30 rounded-lg p-3 text-sm">
-                      <div className="flex items-center justify-between">
+                    <div key={r.id} className="bg-goal-green/10 border border-goal-green/30 rounded-lg p-4 text-sm">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="bg-goal-green/20 text-goal-green px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider">Bekräftad</span>
+                      </div>
+                      <div className="flex items-start justify-between">
                         <div>
-                          <p className="font-semibold text-white">{r.sessions?.date} {r.sessions?.time?.slice(0, 5)}</p>
+                          <p className="font-semibold text-white text-base">{r.sessions?.date} {r.sessions?.time?.slice(0, 5)}</p>
                           <p className="text-ice-muted">{r.sessions?.type} @ {r.sessions?.rink}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-white text-sm font-semibold">{r.teams?.name}</p>
-                          <span className="text-goal-green text-xs font-semibold uppercase">Accepterad</span>
+                          <p className="text-white font-semibold">{r.teams?.name}</p>
+                          <p className="text-ice-muted text-xs">{r.teams?.location}</p>
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-ice-muted text-sm mb-6">Inga bokade tider.</p>
+                <p className="text-ice-muted text-sm mb-6">Inga bekräftade speltider.</p>
               )}
 
               <h4 className="text-xs text-ice-muted uppercase tracking-wider mb-2 font-semibold">Öppna förfrågningar ({pendingGoalieRequests.length})</h4>

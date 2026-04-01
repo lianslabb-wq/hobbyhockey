@@ -3,6 +3,28 @@ import { supabase } from '../lib/supabase'
 import { signUp, signIn, signOut, getUser, resetPassword } from '../lib/auth'
 import RequestCard from '../components/RequestCard'
 
+function MessageInput({ requestId, onSend }) {
+  const [text, setText] = useState('')
+  return (
+    <div className="mt-3 pt-3 border-t border-rink-border flex gap-2">
+      <input
+        type="text"
+        value={text}
+        onChange={e => setText(e.target.value)}
+        placeholder="Skriv ett meddelande till målvakten..."
+        className="flex-1 bg-rink-lighter border border-rink-border rounded-lg px-3 py-2 text-sm text-white placeholder:text-ice-muted/50 focus:outline-none focus:border-jersey-blue/50"
+        onKeyDown={e => { if (e.key === 'Enter' && text.trim()) { onSend(requestId, text.trim()); setText('') } }}
+      />
+      <button
+        onClick={() => { if (text.trim()) { onSend(requestId, text.trim()); setText('') } }}
+        className="px-4 py-2 bg-jersey-blue text-white rounded-lg text-sm font-semibold hover:bg-jersey-blue/80 transition-colors cursor-pointer"
+      >
+        Skicka
+      </button>
+    </div>
+  )
+}
+
 export default function TeamDashboard() {
   const [user, setUser] = useState(null)
   const [team, setTeam] = useState(null)
@@ -15,6 +37,7 @@ export default function TeamDashboard() {
   const [allGoalies, setAllGoalies] = useState([])
   const [goalieSearch, setGoalieSearch] = useState('')
   const [goalieInfo, setGoalieInfo] = useState({})
+  const [messages, setMessages] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [successMsg, setSuccessMsg] = useState('')
@@ -60,6 +83,7 @@ export default function TeamDashboard() {
       loadRequests()
       loadFavorites()
       loadAllGoalies()
+      loadMessages()
     }
   }, [team])
 
@@ -133,6 +157,25 @@ export default function TeamDashboard() {
   async function loadAllGoalies() {
     const { data } = await supabase.from('goalie_directory').select('*').eq('available', true)
     setAllGoalies(data || [])
+  }
+
+  async function loadMessages() {
+    const { data } = await supabase.from('messages').select('*').order('created_at')
+    const grouped = {}
+    for (const m of (data || [])) {
+      if (!grouped[m.request_id]) grouped[m.request_id] = []
+      grouped[m.request_id].push(m)
+    }
+    setMessages(grouped)
+  }
+
+  async function handleSendMessage(requestId, body) {
+    await supabase.from('messages').insert({
+      request_id: requestId,
+      sender_id: user.id,
+      body,
+    })
+    loadMessages()
   }
 
   async function addFavorite(goalieId) {
@@ -600,6 +643,19 @@ export default function TeamDashboard() {
                         })}
                       </div>
                     )}
+                    {/* Messages for confirmed matches */}
+                    {isFilled && req && (messages[req.id] || []).length > 0 && (
+                      <div className="mt-3 pt-3 border-t border-goal-green/20 space-y-2">
+                        <p className="text-xs text-ice-muted uppercase tracking-wide font-semibold">Meddelanden</p>
+                        {(messages[req.id] || []).map(m => (
+                          <div key={m.id} className={`text-sm rounded-lg p-2 ${m.sender_id === user?.id ? 'bg-jersey-blue/10 border border-jersey-blue/20 ml-4' : 'bg-rink-lighter border border-rink-border mr-4'}`}>
+                            <p className="text-white">{m.body}</p>
+                            <p className="text-ice-muted text-xs mt-1">{new Date(m.created_at).toLocaleString('sv-SE', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {isFilled && req && <MessageInput requestId={req.id} onSend={handleSendMessage} />}
                     {/* Show response count if searching */}
                     {!isFilled && req && (
                       <div className="mt-2 pt-2 border-t border-rink-border">

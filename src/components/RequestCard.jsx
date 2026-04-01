@@ -1,4 +1,10 @@
-export default function RequestCard({ request, session, team: teamProp, onRespond, isGoalieView }) {
+import { useState } from 'react'
+
+export default function RequestCard({ request, session, team: teamProp, onRespond, isGoalieView, messages, onSendMessage, currentUserId }) {
+  const [showMessageInput, setShowMessageInput] = useState(false)
+  const [acceptMessage, setAcceptMessage] = useState('')
+  const [newMessage, setNewMessage] = useState('')
+
   if (!session) return null
 
   const teamName = teamProp?.name || request.teams?.name || 'Lag'
@@ -48,10 +54,10 @@ export default function RequestCard({ request, session, team: teamProp, onRespon
       </div>
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <p className="text-sm text-ice-muted font-semibold uppercase tracking-wider">{session.type}</p>
-        {isGoalieView && request.status === 'open' && (
+        {isGoalieView && request.status === 'open' && !showMessageInput && (
           <div className="flex gap-2">
             <button
-              onClick={() => onRespond?.(request.id, 'yes')}
+              onClick={() => setShowMessageInput(true)}
               className="flex-1 sm:flex-none px-5 py-3 bg-goal-green text-white rounded text-sm font-semibold uppercase tracking-wider hover:bg-goal-green/80 transition-colors cursor-pointer"
             >
               Jag kan!
@@ -64,7 +70,67 @@ export default function RequestCard({ request, session, team: teamProp, onRespon
             </button>
           </div>
         )}
+        {isGoalieView && showMessageInput && (
+          <div className="w-full space-y-3">
+            <textarea
+              value={acceptMessage}
+              onChange={e => setAcceptMessage(e.target.value)}
+              placeholder="Skriv ett meddelande till laget (valfritt)"
+              rows={2}
+              className="w-full bg-rink-lighter border border-rink-border rounded-lg p-3 text-sm text-white placeholder:text-ice-muted/50 resize-none focus:outline-none focus:border-jersey-blue/50"
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={() => { onRespond?.(request.id, 'yes', acceptMessage.trim()); setShowMessageInput(false); setAcceptMessage('') }}
+                className="flex-1 sm:flex-none px-5 py-3 bg-goal-green text-white rounded text-sm font-semibold uppercase tracking-wider hover:bg-goal-green/80 transition-colors cursor-pointer"
+              >
+                Acceptera
+              </button>
+              <button
+                onClick={() => { setShowMessageInput(false); setAcceptMessage('') }}
+                className="flex-1 sm:flex-none px-5 py-3 bg-rink-lighter text-ice-muted rounded text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors cursor-pointer"
+              >
+                Avbryt
+              </button>
+            </div>
+          </div>
+        )}
       </div>
+      {/* Message thread for confirmed matches */}
+      {messages?.length > 0 && (
+        <div className="mt-3 pt-3 border-t border-rink-border">
+          <p className="text-xs text-ice-muted mb-2 uppercase tracking-wide font-semibold">Meddelanden</p>
+          <div className="space-y-2">
+            {messages.map(m => (
+              <div key={m.id} className={`text-sm rounded-lg p-2 ${m.sender_id === currentUserId ? 'bg-jersey-blue/10 border border-jersey-blue/20 ml-4' : 'bg-rink-lighter border border-rink-border mr-4'}`}>
+                <p className="text-white">{m.body}</p>
+                <p className="text-ice-muted text-xs mt-1">{m.sender_name || ''} &middot; {new Date(m.created_at).toLocaleString('sv-SE', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {onSendMessage && request.status === 'filled' && (
+        <div className="mt-3 pt-3 border-t border-rink-border">
+          {!messages?.length && <p className="text-xs text-ice-muted mb-2 uppercase tracking-wide font-semibold">Meddelanden</p>}
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={newMessage}
+              onChange={e => setNewMessage(e.target.value)}
+              placeholder="Skriv ett meddelande..."
+              className="flex-1 bg-rink-lighter border border-rink-border rounded-lg px-3 py-2 text-sm text-white placeholder:text-ice-muted/50 focus:outline-none focus:border-jersey-blue/50"
+              onKeyDown={e => { if (e.key === 'Enter' && newMessage.trim()) { onSendMessage(request.id, newMessage.trim()); setNewMessage('') } }}
+            />
+            <button
+              onClick={() => { if (newMessage.trim()) { onSendMessage(request.id, newMessage.trim()); setNewMessage('') } }}
+              className="px-4 py-2 bg-jersey-blue text-white rounded-lg text-sm font-semibold hover:bg-jersey-blue/80 transition-colors cursor-pointer"
+            >
+              Skicka
+            </button>
+          </div>
+        </div>
+      )}
       {!isGoalieView && (
         <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-rink-border">
           <p className="text-xs text-ice-muted mb-2 uppercase tracking-wide font-semibold">Svar ({request.responses?.length || 0})</p>

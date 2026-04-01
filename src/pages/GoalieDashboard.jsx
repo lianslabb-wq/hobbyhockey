@@ -3,6 +3,28 @@ import { supabase } from '../lib/supabase'
 import { signUp, signIn, signOut, getUser, resetPassword } from '../lib/auth'
 import RequestCard from '../components/RequestCard'
 
+function MessageInput({ requestId, onSend }) {
+  const [text, setText] = useState('')
+  return (
+    <div className="mt-3 pt-3 border-t border-goal-green/20 flex gap-2">
+      <input
+        type="text"
+        value={text}
+        onChange={e => setText(e.target.value)}
+        placeholder="Skriv ett meddelande..."
+        className="flex-1 bg-rink-lighter border border-rink-border rounded-lg px-3 py-2 text-sm text-white placeholder:text-ice-muted/50 focus:outline-none focus:border-jersey-blue/50"
+        onKeyDown={e => { if (e.key === 'Enter' && text.trim()) { onSend(requestId, text.trim()); setText('') } }}
+      />
+      <button
+        onClick={() => { if (text.trim()) { onSend(requestId, text.trim()); setText('') } }}
+        className="px-4 py-2 bg-jersey-blue text-white rounded-lg text-sm font-semibold hover:bg-jersey-blue/80 transition-colors cursor-pointer"
+      >
+        Skicka
+      </button>
+    </div>
+  )
+}
+
 export default function GoalieDashboard() {
   const [user, setUser] = useState(null)
   const [goalie, setGoalie] = useState(null)
@@ -30,6 +52,7 @@ export default function GoalieDashboard() {
   const [teamsWhoFavoritedMe, setTeamsWhoFavoritedMe] = useState([])
   const [allTeams, setAllTeams] = useState([])
   const [teamSearch, setTeamSearch] = useState('')
+  const [messages, setMessages] = useState({})
 
   // Goalie registration form
   const [goalieForm, setGoalieForm] = useState({
@@ -49,7 +72,7 @@ export default function GoalieDashboard() {
   }, [user])
 
   useEffect(() => {
-    if (goalie) loadRequests()
+    if (goalie) { loadRequests(); loadMessages() }
   }, [goalie])
 
   async function checkUser() {
@@ -176,7 +199,7 @@ export default function GoalieDashboard() {
     }
   }
 
-  async function handleRespond(requestId, answer) {
+  async function handleRespond(requestId, answer, message) {
     setError('')
     setSuccessMsg('')
     const { error: err } = await supabase.from('responses').insert({
@@ -193,12 +216,40 @@ export default function GoalieDashboard() {
       if (!hasOtherYes) {
         await supabase.from('requests').update({ status: 'filled' }).eq('id', requestId)
       }
+      // Send optional message
+      if (message) {
+        await supabase.from('messages').insert({
+          request_id: requestId,
+          sender_id: user.id,
+          body: message,
+        })
+      }
       setSuccessMsg(`Du har tackat ja till ${session?.type || 'tid'} ${session?.date || ''} ${session?.time?.slice(0, 5) || ''} @ ${session?.rink || ''}`)
     } else {
       setSuccessMsg('Svar skickat — du tackade nej.')
     }
     loadRequests()
+    loadMessages()
     setTimeout(() => setSuccessMsg(''), 8000)
+  }
+
+  async function loadMessages() {
+    const { data } = await supabase.from('messages').select('*').order('created_at')
+    const grouped = {}
+    for (const m of (data || [])) {
+      if (!grouped[m.request_id]) grouped[m.request_id] = []
+      grouped[m.request_id].push(m)
+    }
+    setMessages(grouped)
+  }
+
+  async function handleSendMessage(requestId, body) {
+    await supabase.from('messages').insert({
+      request_id: requestId,
+      sender_id: user.id,
+      body,
+    })
+    loadMessages()
   }
 
   async function handleCancelBooking(requestId) {
@@ -481,27 +532,45 @@ export default function GoalieDashboard() {
           <h2 className="font-display text-lg font-bold uppercase tracking-wider mb-4">Bokade kommande tider ({upcomingBooked.length})</h2>
           {upcomingBooked.length > 0 ? (
             <div className="space-y-2 mb-8">
-              {upcomingBooked.map(req => (
-                <div key={req.id} className="bg-goal-green/10 border border-goal-green/30 rounded-lg p-4 text-sm">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-white">{req.sessions?.date} {req.sessions?.time?.slice(0, 5)}</p>
-                      <p className="text-ice-muted">{req.sessions?.type} @ {req.sessions?.rink}</p>
-                      {req.sessions?.rink_address && <p className="text-ice-muted text-xs">{req.sessions.rink_address}</p>}
+              {upcomingBooked.map(req => {
+                const reqMessages = messages[req.id] || []
+                return (
+                  <div key={req.id} className="bg-goal-green/10 border border-goal-green/30 rounded-lg p-4 text-sm">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="bg-goal-green/20 text-goal-green px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider">Bekräftad</span>
                     </div>
-                    <div className="text-right">
-                      <p className="text-white font-semibold">{req.teams?.name}</p>
-                      <span className="text-goal-green text-xs font-semibold uppercase">Accepterad</span>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold text-white">{req.sessions?.date} {req.sessions?.time?.slice(0, 5)}</p>
+                        <p className="text-ice-muted">{req.sessions?.type} @ {req.sessions?.rink}</p>
+                        {req.sessions?.rink_address && <p className="text-ice-muted text-xs">{req.sessions.rink_address}</p>}
+                      </div>
+                      <div className="text-right">
+                        <p className="text-white font-semibold">{req.teams?.name}</p>
+                        <p className="text-ice-muted text-xs">{req.teams?.location}</p>
+                      </div>
+                    </div>
+                    {/* Messages */}
+                    {reqMessages.length > 0 && (
+                      <div className="mt-3 pt-3 border-t border-goal-green/20 space-y-2">
+                        {reqMessages.map(m => (
+                          <div key={m.id} className={`text-sm rounded-lg p-2 ${m.sender_id === user?.id ? 'bg-jersey-blue/10 border border-jersey-blue/20 ml-4' : 'bg-rink-lighter border border-rink-border mr-4'}`}>
+                            <p className="text-white">{m.body}</p>
+                            <p className="text-ice-muted text-xs mt-1">{new Date(m.created_at).toLocaleString('sv-SE', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <MessageInput requestId={req.id} onSend={handleSendMessage} />
+                    <div className="mt-2 pt-2 border-t border-goal-green/20">
+                      <button onClick={() => handleCancelBooking(req.id)}
+                        className="text-ice-muted hover:text-goal-red text-xs uppercase tracking-wider bg-transparent border-none cursor-pointer transition-colors">
+                        Kan inte längre — avboka
+                      </button>
                     </div>
                   </div>
-                  <div className="mt-2 pt-2 border-t border-goal-green/20">
-                    <button onClick={() => handleCancelBooking(req.id)}
-                      className="text-ice-muted hover:text-goal-red text-xs uppercase tracking-wider bg-transparent border-none cursor-pointer transition-colors">
-                      Kan inte längre — avboka
-                    </button>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           ) : (
             <p className="text-ice-muted mb-8">Du har inga bokade tider ännu. Svara på förfrågningar nedan!</p>
@@ -529,7 +598,8 @@ export default function GoalieDashboard() {
                 }
                 return (
                   <RequestCard key={req.id} request={mapped} session={session}
-                    isGoalieView={true} onRespond={handleRespond} />
+                    isGoalieView={true} onRespond={handleRespond}
+                    messages={messages[req.id]} onSendMessage={handleSendMessage} currentUserId={user?.id} />
                 )
               })}
             </div>

@@ -22,6 +22,7 @@ export default function Admin() {
   const [sessions, setSessions] = useState([])
   const [responses, setResponses] = useState([])
   const [favorites, setFavorites] = useState([])
+  const [goalieFavorites, setGoalieFavorites] = useState([])
 
   useEffect(() => {
     checkUser()
@@ -52,7 +53,7 @@ export default function Admin() {
   }
 
   async function loadAll() {
-    const [t, g, r, s, sess, resp, fav] = await Promise.all([
+    const [t, g, r, s, sess, resp, fav, gfav] = await Promise.all([
       supabase.from('teams').select('*').order('created_at', { ascending: false }),
       supabase.from('goalies').select('*').order('created_at', { ascending: false }),
       supabase.from('requests').select('*, teams(name), sessions(date, time, rink), responses(count)').order('created_at', { ascending: false }),
@@ -60,6 +61,7 @@ export default function Admin() {
       supabase.from('sessions').select('*'),
       supabase.from('responses').select('*'),
       supabase.from('favorites').select('*'),
+      supabase.from('goalie_favorites').select('*'),
     ])
     setTeams(t.data || [])
     setGoalies(g.data || [])
@@ -69,6 +71,7 @@ export default function Admin() {
     setSessions(sess.data || [])
     setResponses(resp.data || [])
     setFavorites(fav.data || [])
+    setGoalieFavorites(gfav.data || [])
   }
 
   const [successMsg, setSuccessMsg] = useState('')
@@ -300,6 +303,10 @@ export default function Admin() {
                 <div className="flex justify-between text-sm">
                   <span className="text-ice-muted">Favorit-kopplingar (lag→målvakt)</span>
                   <span className="text-white font-semibold">{favorites.length}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-ice-muted">Favorit-kopplingar (målvakt→lag)</span>
+                  <span className="text-white font-semibold">{goalieFavorites.length}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-ice-muted">Tillgängliga målvakter</span>

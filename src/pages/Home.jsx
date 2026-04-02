@@ -91,7 +91,7 @@ export default function Home() {
       <div className="w-full max-w-sm mt-10 sm:mt-16">
         <div className="bg-rink-light border border-rink-border rounded-lg p-4 sm:p-5 text-center relative">
           <span className="text-goal-red text-2xl font-display leading-none absolute top-3 left-4">"</span>
-          <blockquote className="text-ice text-sm italic leading-relaxed pt-3">
+          <blockquote className="text-ice-muted text-sm italic leading-relaxed pt-3">
             <p className="font-display text-base font-bold uppercase tracking-wide text-white not-italic mb-1">ÄNTLIGEN!!!!!</p>
             <p className="mb-1">Jag har väntat på att någon ska ordna detta!</p>
             <p className="text-lg mb-1">👍👍👍</p>

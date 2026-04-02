@@ -15,7 +15,7 @@ const faq = [
   },
   {
     q: 'Varför inte bara använda SMS eller WhatsApp?',
-    a: 'I en SMS-kedja eller WhatsApp-grupp når du bara de kontakter du redan har. Med Hobbyhockey når du alla registrerade målvakter i nätverket samtidigt. Du behöver inte veta vem som är ledig — de ser din förfrågan och svarar själva. Många förfrågningar löses inom ett par minuter.'
+    a: 'I en SMS-kedja eller WhatsApp-grupp når du bara de kontakter du redan har. Med Hobbyhockey når du alla registrerade målvakter i nätverket samtidigt. Du behöver inte veta vem som är ledig — de ser din förfrågan och svarar själva. Många förfrågningar löses inom ett par minuter. Dessutom kan lag spara favoritmålvakter och målvakter kan favoritmarkera lag — så bygger ni upp en relation över tid.'
   },
   {
     q: 'Hur snabbt kan jag hitta en målvakt?',
@@ -33,15 +33,7 @@ const faq = [
     q: 'Finns det något liknande för ishockeymålvakter i Sverige?',
     a: 'Det finns inga dedikerade målvaktsgrupper på Facebook eller andra plattformar som löser det här problemet. Hobbyhockey är byggt specifikt för att koppla ihop veteranhockeylag med tillgängliga målvakter.'
   },
-  {
-    q: 'Vad är favoritmålvakter?',
-    a: 'Som lag kan du spara målvakter du gillar som favoriter. Nästa gång du behöver en målvakt ser du direkt vilka du har spelat med förut och litar på.'
-  },
-  {
-    q: 'Vad är favoritlag?',
-    a: 'Som målvakt kan du favoritmarkera lag du trivs med. Du får en snabb överblick över dina favoritlag och kan enkelt hålla koll på när de söker målvakt.'
-  },
-  {
+{
     q: 'Hur registrerar jag mitt lag?',
     a: 'Klicka på "Vi saknar målvakt" på startsidan, skapa ett konto och registrera ditt lag. Sedan kan du direkt börja skapa förfrågningar med tid och plats för era istider.'
   },

@@ -5,18 +5,44 @@ import { getUser } from '../lib/auth'
 import { usePageMeta } from '../lib/usePageMeta'
 
 const faq = [
-  { q: 'Vad är Hobbyhockey?', a: 'Hobbyhockey är en gratis tjänst som kopplar ihop veteranhockeylag med tillgängliga målvakter i Sverige. Istället för att jaga i SMS-grupper och WhatsApp-trådar samlar vi allt på ett ställe.' },
-  { q: 'Kostar det något?', a: 'Nej, Hobbyhockey är helt gratis att använda — både för lag och målvakter.' },
-  { q: 'Hur skiljer sig Hobbyhockey från SMS och WhatsApp-grupper?', a: 'Med Hobbyhockey når du alla registrerade målvakter samtidigt, inte bara de kontakter du redan har. Först till kvarn — ingen väntan på svar som aldrig kommer. Många förfrågningar löses inom ett par minuter.' },
-  { q: 'Hur snabbt kan jag hitta en målvakt?', a: 'Så fort en målvakt svarar på din förfrågan. Många förfrågningar löses inom ett par minuter.' },
-  { q: 'Kan målvakter välja vilka lag de vill spela med?', a: 'Ja, målvakter kan favoritmarkera lag och se vilka lag som söker målvakt just nu.' },
-  { q: 'Vilka lag kan använda tjänsten?', a: 'Alla veteranlag, korplag och hobbylag som spelar ishockey i Sverige — oavsett nivå eller ort.' },
+  {
+    q: 'Vad är Hobbyhockey?',
+    a: 'Hobbyhockey är en gratis plattform som hjälper veteranhockeylag att hitta målvakt till träningar och matcher. Vi samlar lag och målvakter på ett ställe så att ni slipper jaga i SMS-trådar och gruppchatter.'
+  },
+  {
+    q: 'Kostar det något att använda Hobbyhockey?',
+    a: 'Nej, Hobbyhockey är helt gratis — både för lag och målvakter.'
+  },
+  {
+    q: 'Varför inte bara använda SMS eller WhatsApp?',
+    a: 'I en SMS-kedja eller WhatsApp-grupp når du bara de kontakter du redan har. Med Hobbyhockey når du alla registrerade målvakter i nätverket samtidigt. Du behöver inte veta vem som är ledig — de ser din förfrågan och svarar själva. Många förfrågningar löses inom ett par minuter.'
+  },
+  {
+    q: 'Hur snabbt kan jag hitta en målvakt?',
+    a: 'Så fort en målvakt svarar på din förfrågan. Systemet bygger på först till kvarn — den första målvakten som svarar får platsen, och bekräftelse skickas direkt. Många förfrågningar löses inom ett par minuter.'
+  },
+  {
+    q: 'Jag är målvakt — hur fungerar det för mig?',
+    a: 'Registrera dig som målvakt och du ser direkt vilka lag som söker. Du kan favoritmarkera lag du gillar, och svara på förfrågningar med ett klick. Du väljer själv när och var du vill spela.'
+  },
+  {
+    q: 'Vilka lag kan använda Hobbyhockey?',
+    a: 'Alla veteranhockeylag och hobbylag som spelar ishockey i Sverige. Oavsett nivå, division eller ort — om ni ibland saknar en målvakt är Hobbyhockey till för er.'
+  },
+  {
+    q: 'Finns det något liknande för ishockeymålvakter i Sverige?',
+    a: 'Det finns inga dedikerade målvaktsgrupper på Facebook eller andra plattformar som löser det här problemet. Hobbyhockey är byggt specifikt för att koppla ihop veteranhockeylag med tillgängliga målvakter.'
+  },
+  {
+    q: 'Hur registrerar jag mitt lag?',
+    a: 'Klicka på "Vi saknar målvakt" på startsidan, skapa ett konto och registrera ditt lag. Sedan kan du direkt börja skapa förfrågningar med tid och plats för era istider.'
+  },
 ]
 
 export default function About() {
   const navigate = useNavigate()
   const [openFaq, setOpenFaq] = useState(null)
-  usePageMeta('Om Hobbyhockey — Hitta målvakt till veteranhockey', 'Läs om hur Hobbyhockey kopplar ihop veteranhockeylag med målvakter i Sverige. Vanliga frågor, kontakt och mer.')
+  usePageMeta('Om Hobbyhockey — Hitta målvakt till veteranhockey i Sverige', 'Hobbyhockey kopplar ihop veteranhockeylag med målvakter i Sverige. Läs om hur det fungerar, vanliga frågor och kontakt.')
 
   async function handleSupportClick(e) {
     e.preventDefault()
@@ -37,39 +63,25 @@ export default function About() {
           <p>
             Du känner till det: det är tisdag eftermiddag och Robban inser att ingen av lagets två målvakter
             kan komma till träningen ikväll. Nu börjar den stressiga jakten — sms, samtal, meddelanden i
-            WhatsApp-grupper och Facebook-grupper. Ibland hittar man någon, ibland står laget utan målvakt.
-          </p>
-          <p className="mt-3">
-            Det finns inga målvaktsgrupper på Facebook som löser problemet. SMS-kedjor når bara de
-            kontakter man redan har. Veteranhockeylag i hela Sverige står inför samma utmaning varje vecka.
+            gruppchatter. Ibland hittar man någon, ibland står laget utan målvakt.
           </p>
         </section>
 
         <section>
           <h2 className="font-display text-xl font-bold text-white uppercase tracking-wider mb-3">Lösningen</h2>
           <p>
-            Hobbyhockey är en gratis plattform som kopplar ihop veteranhockeylag och korphockeylag med
-            tillgängliga målvakter. När ditt lag saknar en målvakt till nästa träning eller match, skicka ut
-            en förfrågan — till dina favoritmålvakter eller till hela nätverket. Först till kvarn får platsen.
-            Många förfrågningar löses inom ett par minuter.
-          </p>
-          <p className="mt-3">
-            Istället för att jaga i SMS-trådar och gruppchatter samlar Hobbyhockey allt på ett ställe.
-            Du når fler målvakter snabbare, och målvakter kan själva välja vilka lag de vill spela med.
+            Hobbyhockey är en enkel plattform som kopplar ihop veteranhockeylag med tillgängliga målvakter.
+            När ditt lag saknar en målvakt, skicka ut en förfrågan — till dina favoriter eller till hela nätverket.
+            Först till kvarn får platsen, övriga blir standby.
           </p>
         </section>
 
         <section>
           <h2 className="font-display text-xl font-bold text-white uppercase tracking-wider mb-3">För vem?</h2>
           <p>
-            Hobbyhockey riktar sig till veteran- och rekreationshockey i Sverige — veteranlag, korplag,
-            hobbylag och alla som spelar ishockey för nöjes skull. Organiserad hockey har spelarregistrering
-            som binder spelare till lag över en hel säsong. I veteranhockeyn är det friare — och behovet
-            av att hitta en målvakt med kort varsel är stort.
-          </p>
-          <p className="mt-3">
-            Är du målvakt och vill hitta istid? Registrera dig och se vilka lag i ditt område som behöver dig.
-            Är du lagledare och söker målvakt? Skapa en förfrågan och nå alla tillgängliga målvakter direkt.
+            Vi riktar oss till veteran- och rekreationshockey i Sverige. Organiserad hockey har
+            spelarregistrering som binder spelare till lag över en hel säsong. I veteranhockeyn är
+            det friare — och behovet av ad hoc-målvakter är stort.
           </p>
         </section>
 
@@ -91,7 +103,17 @@ export default function About() {
           </a>
         </section>
 
-        <section>
+        <section className="text-center pt-6 border-t border-rink-border">
+          <p className="text-ice-muted text-sm mb-4 font-semibold uppercase tracking-wider">Gillar du vad vi bygger?</p>
+          <button
+            onClick={handleSupportClick}
+            className="px-6 py-3 bg-goal-red text-white font-semibold rounded text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer"
+          >
+            Stöd oss med en kaffe
+          </button>
+        </section>
+
+        <section className="pt-6 border-t border-rink-border">
           <h2 className="font-display text-xl font-bold text-white uppercase tracking-wider mb-4">Vanliga frågor</h2>
           <div className="space-y-2">
             {faq.map((item, i) => (
@@ -101,7 +123,7 @@ export default function About() {
                   className="w-full text-left px-4 py-3 flex justify-between items-center bg-transparent border-none cursor-pointer text-white text-sm font-semibold hover:text-jersey-blue transition-colors"
                 >
                   {item.q}
-                  <span className="text-ice-muted ml-2">{openFaq === i ? '−' : '+'}</span>
+                  <span className="text-ice-muted ml-2 shrink-0">{openFaq === i ? '−' : '+'}</span>
                 </button>
                 {openFaq === i && (
                   <p className="px-4 pb-3 text-sm text-ice-muted leading-relaxed">{item.a}</p>
@@ -118,16 +140,6 @@ export default function About() {
               'acceptedAnswer': { '@type': 'Answer', 'text': item.a }
             }))
           })}} />
-        </section>
-
-        <section className="text-center pt-6 border-t border-rink-border">
-          <p className="text-ice-muted text-sm mb-4 font-semibold uppercase tracking-wider">Gillar du vad vi bygger?</p>
-          <button
-            onClick={handleSupportClick}
-            className="px-6 py-3 bg-goal-red text-white font-semibold rounded text-sm uppercase tracking-wider hover:bg-goal-red-light transition-colors cursor-pointer"
-          >
-            Stöd oss med en kaffe
-          </button>
         </section>
       </div>
     </div>

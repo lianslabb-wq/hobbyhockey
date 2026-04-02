@@ -34,6 +34,14 @@ const faq = [
     a: 'Det finns inga dedikerade målvaktsgrupper på Facebook eller andra plattformar som löser det här problemet. Hobbyhockey är byggt specifikt för att koppla ihop veteranhockeylag med tillgängliga målvakter.'
   },
   {
+    q: 'Vad är favoritmålvakter?',
+    a: 'Som lag kan du spara målvakter du gillar som favoriter. Nästa gång du behöver en målvakt ser du direkt vilka du har spelat med förut och litar på.'
+  },
+  {
+    q: 'Vad är favoritlag?',
+    a: 'Som målvakt kan du favoritmarkera lag du trivs med. Du får en snabb överblick över dina favoritlag och kan enkelt hålla koll på när de söker målvakt.'
+  },
+  {
     q: 'Hur registrerar jag mitt lag?',
     a: 'Klicka på "Vi saknar målvakt" på startsidan, skapa ett konto och registrera ditt lag. Sedan kan du direkt börja skapa förfrågningar med tid och plats för era istider.'
   },

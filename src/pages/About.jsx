@@ -24,25 +24,39 @@ export default function About() {
           <p>
             Du känner till det: det är tisdag eftermiddag och Robban inser att ingen av lagets två målvakter
             kan komma till träningen ikväll. Nu börjar den stressiga jakten — sms, samtal, meddelanden i
-            gruppchatter. Ibland hittar man någon, ibland står laget utan målvakt.
+            WhatsApp-grupper och Facebook-grupper. Ibland hittar man någon, ibland står laget utan målvakt.
+          </p>
+          <p className="mt-3">
+            Det finns inga målvaktsgrupper på Facebook som löser problemet. SMS-kedjor når bara de
+            kontakter man redan har. Veteranhockeylag i hela Sverige står inför samma utmaning varje vecka.
           </p>
         </section>
 
         <section>
           <h2 className="font-display text-xl font-bold text-white uppercase tracking-wider mb-3">Lösningen</h2>
           <p>
-            Hobbyhockey är en enkel plattform som kopplar ihop veteranhockeylag med tillgängliga målvakter.
-            När ditt lag saknar en målvakt, skicka ut en förfrågan — till dina favoriter eller till hela nätverket.
-            Först till kvarn får platsen, övriga blir standby.
+            Hobbyhockey är en gratis plattform som kopplar ihop veteranhockeylag och korphockeylag med
+            tillgängliga målvakter. När ditt lag saknar en målvakt till nästa träning eller match, skicka ut
+            en förfrågan — till dina favoritmålvakter eller till hela nätverket. Först till kvarn får platsen.
+            Många förfrågningar löses inom ett par minuter.
+          </p>
+          <p className="mt-3">
+            Istället för att jaga i SMS-trådar och gruppchatter samlar Hobbyhockey allt på ett ställe.
+            Du når fler målvakter snabbare, och målvakter kan själva välja vilka lag de vill spela med.
           </p>
         </section>
 
         <section>
           <h2 className="font-display text-xl font-bold text-white uppercase tracking-wider mb-3">För vem?</h2>
           <p>
-            Vi riktar oss till veteran- och rekreationshockey i Sverige. Organiserad hockey har
-            spelarregistrering som binder spelare till lag över en hel säsong. I veteranhockeyn är
-            det friare — och behovet av ad hoc-målvakter är stort.
+            Hobbyhockey riktar sig till veteran- och rekreationshockey i Sverige — veteranlag, korplag,
+            hobbylag och alla som spelar ishockey för nöjes skull. Organiserad hockey har spelarregistrering
+            som binder spelare till lag över en hel säsong. I veteranhockeyn är det friare — och behovet
+            av att hitta en målvakt med kort varsel är stort.
+          </p>
+          <p className="mt-3">
+            Är du målvakt och vill hitta istid? Registrera dig och se vilka lag i ditt område som behöver dig.
+            Är du lagledare och söker målvakt? Skapa en förfrågan och nå alla tillgängliga målvakter direkt.
           </p>
         </section>
 

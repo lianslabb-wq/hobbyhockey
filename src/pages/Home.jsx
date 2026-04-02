@@ -86,6 +86,20 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Testimonial */}
+      <div className="w-full max-w-2xl mt-10 sm:mt-16">
+        <div className="bg-rink-light border border-rink-border rounded-lg p-6 sm:p-10 text-center relative">
+          <span className="text-goal-red text-4xl sm:text-5xl font-display leading-none absolute top-4 left-6">"</span>
+          <blockquote className="text-ice text-base sm:text-lg italic leading-relaxed pt-4">
+            <p className="font-display text-xl sm:text-2xl font-bold uppercase tracking-wide text-white not-italic mb-2">ÄNTLIGEN!!!!!</p>
+            <p className="mb-2">Jag har väntat på att någon ska ordna detta!</p>
+            <p className="text-2xl mb-2">👍👍👍</p>
+            <p>Har sökt efter målvaktsgrupper på Facebook, men det verkar inte finnas något där heller. 😅</p>
+          </blockquote>
+          <p className="mt-4 text-sm text-ice-muted font-semibold tracking-wide">— Max, HKHC</p>
+        </div>
+      </div>
     </div>
   )
 }

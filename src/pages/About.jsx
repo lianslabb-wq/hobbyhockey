@@ -1,9 +1,22 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { getUser } from '../lib/auth'
+import { usePageMeta } from '../lib/usePageMeta'
+
+const faq = [
+  { q: 'Vad är Hobbyhockey?', a: 'Hobbyhockey är en gratis tjänst som kopplar ihop veteranhockeylag med tillgängliga målvakter i Sverige. Istället för att jaga i SMS-grupper och WhatsApp-trådar samlar vi allt på ett ställe.' },
+  { q: 'Kostar det något?', a: 'Nej, Hobbyhockey är helt gratis att använda — både för lag och målvakter.' },
+  { q: 'Hur skiljer sig Hobbyhockey från SMS och WhatsApp-grupper?', a: 'Med Hobbyhockey når du alla registrerade målvakter samtidigt, inte bara de kontakter du redan har. Först till kvarn — ingen väntan på svar som aldrig kommer. Många förfrågningar löses inom ett par minuter.' },
+  { q: 'Hur snabbt kan jag hitta en målvakt?', a: 'Så fort en målvakt svarar på din förfrågan. Många förfrågningar löses inom ett par minuter.' },
+  { q: 'Kan målvakter välja vilka lag de vill spela med?', a: 'Ja, målvakter kan favoritmarkera lag och se vilka lag som söker målvakt just nu.' },
+  { q: 'Vilka lag kan använda tjänsten?', a: 'Alla veteranlag, korplag och hobbylag som spelar ishockey i Sverige — oavsett nivå eller ort.' },
+]
 
 export default function About() {
   const navigate = useNavigate()
+  const [openFaq, setOpenFaq] = useState(null)
+  usePageMeta('Om Hobbyhockey — Hitta målvakt till veteranhockey', 'Läs om hur Hobbyhockey kopplar ihop veteranhockeylag med målvakter i Sverige. Vanliga frågor, kontakt och mer.')
 
   async function handleSupportClick(e) {
     e.preventDefault()
@@ -76,6 +89,35 @@ export default function About() {
           <a href="mailto:lianslabb@gmail.com" className="text-jersey-blue hover:text-jersey-blue-light transition-colors">
             lianslabb@gmail.com
           </a>
+        </section>
+
+        <section>
+          <h2 className="font-display text-xl font-bold text-white uppercase tracking-wider mb-4">Vanliga frågor</h2>
+          <div className="space-y-2">
+            {faq.map((item, i) => (
+              <div key={i} className="bg-rink-light border border-rink-border rounded-lg overflow-hidden">
+                <button
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  className="w-full text-left px-4 py-3 flex justify-between items-center bg-transparent border-none cursor-pointer text-white text-sm font-semibold hover:text-jersey-blue transition-colors"
+                >
+                  {item.q}
+                  <span className="text-ice-muted ml-2">{openFaq === i ? '−' : '+'}</span>
+                </button>
+                {openFaq === i && (
+                  <p className="px-4 pb-3 text-sm text-ice-muted leading-relaxed">{item.a}</p>
+                )}
+              </div>
+            ))}
+          </div>
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            'mainEntity': faq.map(item => ({
+              '@type': 'Question',
+              'name': item.q,
+              'acceptedAnswer': { '@type': 'Answer', 'text': item.a }
+            }))
+          })}} />
         </section>
 
         <section className="text-center pt-6 border-t border-rink-border">

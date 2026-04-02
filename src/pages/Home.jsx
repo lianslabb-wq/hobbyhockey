@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
+import { usePageMeta } from '../lib/usePageMeta'
 
 export default function Home() {
+  usePageMeta('Hobbyhockey — Hitta en målvakt till ditt veteranhockeylag', 'Saknar ditt lag en målvakt? Hobbyhockey kopplar ihop veteranhockeylag med tillgängliga målvakter — snabbt och enkelt.')
   return (
     <div className="flex flex-col items-center py-6 sm:py-12">
       {/* Hero */}

@@ -7,7 +7,7 @@ export default function Privacy() {
         <section>
           <h2 className="font-display text-xl font-bold text-white uppercase tracking-wider mb-3">Vem ansvarar för dina uppgifter?</h2>
           <p>
-            Hobbyhockey är ett ideellt projekt utan organisationsnummer. Ansvarig för behandlingen av
+            HopInHockey är ett ideellt projekt utan organisationsnummer. Ansvarig för behandlingen av
             personuppgifter är projektets grundare. Vid frågor, kontakta oss på{' '}
             <a href="mailto:lianslabb@gmail.com" className="text-jersey-blue hover:text-jersey-blue-light transition-colors">
               lianslabb@gmail.com

@@ -6,16 +6,16 @@ import { usePageMeta } from '../lib/usePageMeta'
 
 const faq = [
   {
-    q: 'Vad är Hobbyhockey?',
-    a: 'Hobbyhockey är en gratis plattform som hjälper veteranhockeylag att hitta målvakt till träningar och matcher. Vi samlar lag och målvakter på ett ställe så att ni slipper jaga i SMS-trådar och gruppchatter.'
+    q: 'Vad är HopInHockey?',
+    a: 'HopInHockey är en gratis plattform som hjälper veteranhockeylag att hitta målvakt till träningar och matcher. Vi samlar lag och målvakter på ett ställe så att ni slipper jaga i SMS-trådar och gruppchatter.'
   },
   {
-    q: 'Kostar det något att använda Hobbyhockey?',
-    a: 'Nej, Hobbyhockey är helt gratis — både för lag och målvakter.'
+    q: 'Kostar det något att använda HopInHockey?',
+    a: 'Nej, HopInHockey är helt gratis — både för lag och målvakter.'
   },
   {
     q: 'Varför inte bara använda SMS eller WhatsApp?',
-    a: 'I en SMS-kedja eller WhatsApp-grupp når du bara de kontakter du redan har. Med Hobbyhockey når du alla registrerade målvakter i nätverket samtidigt. Du behöver inte veta vem som är ledig — de ser din förfrågan och svarar själva. Många förfrågningar löses inom ett par minuter. Dessutom kan lag spara favoritmålvakter och målvakter kan favoritmarkera lag — så bygger ni upp en relation över tid.'
+    a: 'I en SMS-kedja eller WhatsApp-grupp når du bara de kontakter du redan har. Med HopInHockey når du alla registrerade målvakter i nätverket samtidigt. Du behöver inte veta vem som är ledig — de ser din förfrågan och svarar själva. Många förfrågningar löses inom ett par minuter. Dessutom kan lag spara favoritmålvakter och målvakter kan favoritmarkera lag — så bygger ni upp en relation över tid.'
   },
   {
     q: 'Hur snabbt kan jag hitta en målvakt?',
@@ -26,12 +26,12 @@ const faq = [
     a: 'Registrera dig som målvakt och du ser direkt vilka lag som söker. Du kan favoritmarkera lag du gillar, och svara på förfrågningar med ett klick. Du väljer själv när och var du vill spela.'
   },
   {
-    q: 'Vilka lag kan använda Hobbyhockey?',
-    a: 'Alla veteranhockeylag och hobbylag som spelar ishockey i Sverige. Oavsett nivå, division eller ort — om ni ibland saknar en målvakt är Hobbyhockey till för er.'
+    q: 'Vilka lag kan använda HopInHockey?',
+    a: 'Alla veteranhockeylag och hobbylag som spelar ishockey i Sverige. Oavsett nivå, division eller ort — om ni ibland saknar en målvakt är HopInHockey till för er.'
   },
   {
     q: 'Finns det något liknande för ishockeymålvakter i Sverige?',
-    a: 'Det finns inga dedikerade målvaktsgrupper på Facebook eller andra plattformar som löser det här problemet. Hobbyhockey är byggt specifikt för att koppla ihop veteranhockeylag med tillgängliga målvakter.'
+    a: 'Det finns inga dedikerade målvaktsgrupper på Facebook eller andra plattformar som löser det här problemet. HopInHockey är byggt specifikt för att koppla ihop veteranhockeylag med tillgängliga målvakter.'
   },
 {
     q: 'Hur registrerar jag mitt lag?',
@@ -42,7 +42,7 @@ const faq = [
 export default function About() {
   const navigate = useNavigate()
   const [openFaq, setOpenFaq] = useState(null)
-  usePageMeta('Om Hobbyhockey — Hitta målvakt till veteranhockey i Sverige', 'Hobbyhockey kopplar ihop veteranhockeylag med målvakter i Sverige. Läs om hur det fungerar, vanliga frågor och kontakt.')
+  usePageMeta('Om HopInHockey — Hitta målvakt till veteranhockey i Sverige', 'HopInHockey kopplar ihop veteranhockeylag med målvakter i Sverige. Läs om hur det fungerar, vanliga frågor och kontakt.')
 
   async function handleSupportClick(e) {
     e.preventDefault()
@@ -55,7 +55,7 @@ export default function About() {
 
   return (
     <div className="max-w-2xl mx-auto py-8">
-      <h1 className="font-display text-4xl font-bold uppercase tracking-tight mb-8">Om Hobbyhockey</h1>
+      <h1 className="font-display text-4xl font-bold uppercase tracking-tight mb-8">Om HopInHockey</h1>
 
       <div className="space-y-8 text-ice-muted leading-relaxed">
         <section>
@@ -70,7 +70,7 @@ export default function About() {
         <section>
           <h2 className="font-display text-xl font-bold text-white uppercase tracking-wider mb-3">Lösningen</h2>
           <p>
-            Hobbyhockey är en enkel plattform som kopplar ihop veteranhockeylag med tillgängliga målvakter.
+            HopInHockey är en enkel plattform som kopplar ihop veteranhockeylag med tillgängliga målvakter.
             När ditt lag saknar en målvakt, skicka ut en förfrågan — till dina favoriter eller till hela nätverket.
             Först till kvarn får platsen, övriga blir standby.
           </p>
@@ -88,7 +88,7 @@ export default function About() {
         <section>
           <h2 className="font-display text-xl font-bold text-white uppercase tracking-wider mb-3">Vilka är vi?</h2>
           <p>
-            Hobbyhockey är ett projekt som föddes ur ett riktigt behov på isen. Vi bygger det
+            HopInHockey är ett projekt som föddes ur ett riktigt behov på isen. Vi bygger det
             här för att göra det enklare för alla att spela hockey — utan stress.
           </p>
         </section>

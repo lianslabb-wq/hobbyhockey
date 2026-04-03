@@ -1,6 +1,6 @@
 {
-  "name": "Hobbyhockey",
-  "short_name": "Hobbyhockey",
+  "name": "HopInHockey",
+  "short_name": "HopInHockey",
   "description": "Hitta en målvakt till ditt veteranhockeylag",
   "start_url": "/",
   "display": "standalone",

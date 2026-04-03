@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://hobbyhockey.vercel.app/sitemap.xml
+Sitemap: https://hopinhockey.se/sitemap.xml

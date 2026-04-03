@@ -124,7 +124,7 @@ export default function MyPage() {
   return (
     <div>
       <h1 className="font-display text-3xl font-bold uppercase tracking-tight mb-2">Min sida</h1>
-      <p className="text-ice-muted mb-8">Översikt av dina aktiviteter på Hobbyhockey.</p>
+      <p className="text-ice-muted mb-8">Översikt av dina aktiviteter på HopInHockey.</p>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* LEFT COLUMN: Lagtider */}

@@ -62,12 +62,12 @@ export default function Layout({ children }) {
             <div className="w-10 h-10 bg-goal-red rounded flex items-center justify-center text-white font-display font-bold text-xl tracking-tight group-hover:bg-goal-red-light transition-colors shrink-0">
               H
             </div>
-            <div className="hidden sm:block">
-              <h1 className="font-display text-xl font-bold text-white uppercase tracking-wide leading-tight">
-                Hobbyhockey
+            <div className="hidden sm:inline-flex sm:flex-col">
+              <h1 className="font-display text-xl font-bold uppercase tracking-tight text-white leading-none">
+                HOP<span className="text-goal-red">IN</span>HOCKEY
               </h1>
-              <p className="text-[10px] text-ice-muted font-semibold uppercase tracking-[0.2em] leading-tight">
-                Hitta en målvakt
+              <p className="text-ice-muted font-semibold uppercase leading-none mt-1" style={{fontSize: '7.5px', display: 'flex', justifyContent: 'space-between'}}>
+                {'HITTA EN MÅLVAKT'.split('').map((ch, i) => <span key={i}>{ch === ' ' ? '\u00A0' : ch}</span>)}
               </p>
             </div>
           </Link>
@@ -160,7 +160,7 @@ export default function Layout({ children }) {
         {children}
       </main>
       <footer className="border-t border-rink-border py-6 text-center">
-        <p className="text-xs text-ice-muted font-semibold uppercase tracking-widest mb-2">Hobbyhockey</p>
+        <p className="text-xs text-ice-muted font-semibold uppercase tracking-widest mb-2">HopInHockey</p>
         <Link to="/integritet" className="text-xs text-ice-muted hover:text-white no-underline transition-colors">
           Integritetspolicy
         </Link>

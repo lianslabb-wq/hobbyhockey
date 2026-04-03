@@ -14,13 +14,13 @@ export default function Thanks() {
         att donera, men vi jobbar på det.
       </p>
       <p className="text-ice-muted leading-relaxed mb-8">
-        Hobbyhockey byggs på fritiden av folk som älskar hockey och vill lösa ett riktigt
+        HopInHockey byggs på fritiden av folk som älskar hockey och vill lösa ett riktigt
         problem. Att veta att fler bryr sig ger oss energi att fortsätta bygga.
       </p>
       <div className="bg-rink-light border border-rink-border rounded-lg p-5 mb-8">
         <p className="text-white font-semibold mb-1">Vill du hjälpa till på riktigt?</p>
         <p className="text-ice-muted text-sm">
-          Tipsa ett lag eller en målvakt om Hobbyhockey — det är det bästa stödet vi kan få just nu.
+          Tipsa ett lag eller en målvakt om HopInHockey — det är det bästa stödet vi kan få just nu.
         </p>
       </div>
       <Link

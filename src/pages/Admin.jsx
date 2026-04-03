@@ -547,146 +547,53 @@ export default function Admin() {
       )}
 
       {tab === 'brand' && (
-        <div className="space-y-8">
+        <div className="space-y-10">
           <p className="text-ice-muted text-sm">Intern sida — syns bara för admin. Jämför varumärkesförslag visuellt.</p>
 
-          {/* Nuvarande */}
+          {/* Sida vid sida jämförelse */}
           <div>
-            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-3">Nuvarande</h3>
-            <div className="bg-rink border border-rink-border rounded-lg p-6 sm:p-8 inline-flex items-center gap-4">
-              <div className="w-10 h-10 bg-goal-red rounded-lg flex items-center justify-center font-display text-xl font-bold text-white shrink-0">H</div>
+            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-4">Jämförelse</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <p className="font-display text-xl sm:text-2xl font-bold uppercase tracking-tight text-white leading-none">Hobbyhockey</p>
-                <p className="text-ice-muted text-xs sm:text-sm tracking-wider uppercase mt-0.5">Hitta en målvakt</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Förslag A */}
-          <div>
-            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-3">Förslag A — Hitta Målvakten</h3>
-            <div className="space-y-4">
-              <div className="bg-rink border border-rink-border rounded-lg p-6 sm:p-8 inline-flex items-center gap-4">
-                <div className="w-10 h-10 bg-goal-red rounded-lg flex items-center justify-center font-display text-xl font-bold text-white shrink-0">H</div>
-                <div>
-                  <p className="font-display text-xl sm:text-2xl font-bold uppercase tracking-tight text-white leading-none">Hitta Målvakten</p>
-                  <p className="text-ice-muted text-xs sm:text-sm tracking-wider uppercase mt-0.5">Aldrig utan målvakt igen</p>
+                <p className="text-ice-muted text-xs uppercase tracking-wider mb-2 font-semibold">Nuvarande</p>
+                <div className="bg-puck border border-rink-border rounded-lg p-6 flex items-center gap-3">
+                  <div className="w-10 h-10 bg-goal-red rounded-lg flex items-center justify-center font-display text-xl font-bold text-white shrink-0">H</div>
+                  <div>
+                    <p className="font-display text-xl font-bold uppercase tracking-tight text-white leading-none">Hobbyhockey</p>
+                    <p className="text-ice-muted text-[10px] font-semibold tracking-[0.18em] uppercase mt-1 leading-none">Hitta en målvakt</p>
+                  </div>
                 </div>
               </div>
-              <div className="bg-rink border border-rink-border rounded-lg p-6 sm:p-8 inline-flex items-center gap-4">
-                <div className="w-10 h-10 bg-goal-red rounded-lg flex items-center justify-center font-display text-xl font-bold text-white shrink-0">H</div>
-                <div>
-                  <p className="font-display text-xl sm:text-2xl font-bold uppercase tracking-tight text-white leading-none">Hitta Målvakten</p>
-                  <p className="text-ice-muted text-xs sm:text-sm tracking-wider uppercase mt-0.5">Förfrågan ut. Målvakt in.</p>
-                </div>
-              </div>
-              <div className="bg-rink border border-rink-border rounded-lg p-6 sm:p-8 inline-flex items-center gap-4">
-                <div className="w-10 h-10 bg-goal-red rounded-lg flex items-center justify-center font-display text-xl font-bold text-white shrink-0">H</div>
-                <div>
-                  <p className="font-display text-xl sm:text-2xl font-bold uppercase tracking-tight text-white leading-none">Hitta Målvakten</p>
-                  <p className="text-ice-muted text-xs sm:text-sm tracking-wider uppercase mt-0.5">Veteranhockeyns målvaktsnätverk</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Förslag — Hitta Målvakt (Rickards favorit) */}
-          <div>
-            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-3">Förslag — Hitta Målvakt</h3>
-            <div className="bg-rink border border-rink-border rounded-lg p-6 sm:p-8 inline-flex items-center gap-4">
-              <div className="w-10 h-10 bg-goal-red rounded-lg flex items-center justify-center font-display text-xl font-bold text-white shrink-0">H</div>
               <div>
-                <p className="font-display text-2xl sm:text-3xl font-bold uppercase tracking-tight text-white leading-none">Hitta Målvakt</p>
-                <p className="text-ice-muted text-[10px] sm:text-[11px] font-semibold tracking-[0.15em] uppercase mt-1 leading-none">Aldrig tomt i buren</p>
+                <p className="text-ice-muted text-xs uppercase tracking-wider mb-2 font-semibold">Förslag</p>
+                <div className="bg-puck border border-goal-red/40 rounded-lg p-6 flex items-center gap-3">
+                  <div className="w-10 h-10 bg-goal-red rounded-lg flex items-center justify-center font-display text-xl font-bold text-white shrink-0">H</div>
+                  <div>
+                    <p className="font-display text-xl font-bold uppercase tracking-tight text-white leading-none">HopInHockey</p>
+                    <p className="text-ice-muted text-[10px] font-semibold tracking-[0.18em] uppercase mt-1 leading-none">Hitta en målvakt</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Förslag — HopInHockey */}
+          {/* Större visning */}
           <div>
-            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-3">Förslag — HopInHockey</h3>
-            <div className="bg-rink border border-rink-border rounded-lg p-6 sm:p-8 inline-flex items-center gap-4">
-              <div className="w-10 h-10 bg-goal-red rounded-lg flex items-center justify-center font-display text-xl font-bold text-white shrink-0">H</div>
+            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-4">Förslag — stor visning</h3>
+            <div className="bg-puck border border-rink-border rounded-lg p-8 sm:p-12 inline-flex items-center gap-5">
+              <div className="w-12 h-12 bg-goal-red rounded-lg flex items-center justify-center font-display text-2xl font-bold text-white shrink-0">H</div>
               <div>
-                <p className="font-display text-xl sm:text-2xl font-bold uppercase tracking-tight text-white leading-none">HopInHockey</p>
-                <p className="text-ice-muted text-xs sm:text-sm tracking-wider uppercase mt-0.5">Hitta en målvakt</p>
+                <p className="font-display text-2xl sm:text-3xl font-bold uppercase tracking-tight text-white leading-none">HopInHockey</p>
+                <p className="text-ice-muted text-xs sm:text-sm font-semibold tracking-[0.18em] uppercase mt-1 leading-none">Hitta en målvakt</p>
               </div>
             </div>
           </div>
 
-          {/* Förslag B */}
-          <div>
-            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-3">Förslag B — Buren</h3>
-            <div className="space-y-4">
-              <div className="bg-rink border border-rink-border rounded-lg p-6 sm:p-8 inline-flex items-center gap-4">
-                <div className="w-10 h-10 bg-goal-red rounded-lg flex items-center justify-center font-display text-xl font-bold text-white shrink-0">B</div>
-                <div>
-                  <p className="font-display text-xl sm:text-2xl font-bold uppercase tracking-tight text-white leading-none">Buren</p>
-                  <p className="text-ice-muted text-xs sm:text-sm tracking-wider uppercase mt-0.5">Hitta en målvakt</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Förslag C */}
-          <div>
-            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-3">Förslag C — Vakta</h3>
-            <div className="space-y-4">
-              <div className="bg-rink border border-rink-border rounded-lg p-6 sm:p-8 inline-flex items-center gap-4">
-                <div className="w-10 h-10 bg-goal-red rounded-lg flex items-center justify-center font-display text-xl font-bold text-white shrink-0">V</div>
-                <div>
-                  <p className="font-display text-xl sm:text-2xl font-bold uppercase tracking-tight text-white leading-none">Vakta</p>
-                  <p className="text-ice-muted text-xs sm:text-sm tracking-wider uppercase mt-0.5">Hitta en målvakt</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
+          {/* Domän */}
           <div className="border-t border-rink-border pt-6">
-            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-3">Jämförelsetabell</h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-rink-border">
-                    <th className="text-left py-2 text-ice-muted font-semibold">Namn</th>
-                    <th className="text-left py-2 text-ice-muted font-semibold">Domän</th>
-                    <th className="text-left py-2 text-ice-muted font-semibold">Varumärkesskydd</th>
-                    <th className="text-left py-2 text-ice-muted font-semibold">SEO</th>
-                    <th className="text-left py-2 text-ice-muted font-semibold">Skalbarhet</th>
-                  </tr>
-                </thead>
-                <tbody className="text-ice-muted">
-                  <tr className="border-b border-rink-border/50">
-                    <td className="py-2 text-white font-semibold">Hobbyhockey</td>
-                    <td className="py-2">hobbyhockey.se</td>
-                    <td className="py-2 text-goal-green">Starkt</td>
-                    <td className="py-2 text-yellow-400">Medel</td>
-                    <td className="py-2 text-yellow-400">Bred men vag</td>
-                  </tr>
-                  <tr className="border-b border-rink-border/50">
-                    <td className="py-2 text-white font-semibold">Hitta Målvakten</td>
-                    <td className="py-2">hittamalvakten.se</td>
-                    <td className="py-2 text-yellow-400">Svagare</td>
-                    <td className="py-2 text-goal-green">Stark</td>
-                    <td className="py-2 text-yellow-400">Bundet till målvakt</td>
-                  </tr>
-                  <tr className="border-b border-rink-border/50">
-                    <td className="py-2 text-white font-semibold">Buren</td>
-                    <td className="py-2">buren.se</td>
-                    <td className="py-2 text-goal-green">Starkt</td>
-                    <td className="py-2 text-yellow-400">Medel</td>
-                    <td className="py-2 text-goal-green">Bandy, fotboll</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2 text-white font-semibold">Vakta</td>
-                    <td className="py-2">vakta.se</td>
-                    <td className="py-2 text-goal-green">Starkt</td>
-                    <td className="py-2 text-yellow-400">Medel</td>
-                    <td className="py-2 text-goal-green">Alla sporter</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-3">Domän</h3>
+            <p className="text-white font-semibold">hopinhockey.se</p>
+            <p className="text-ice-muted text-sm mt-1">Kort, tydligt, hockey i namnet. H-ikonen behålls. "Hitta en målvakt" som tagline.</p>
           </div>
         </div>
       )}

@@ -577,14 +577,14 @@ export default function Admin() {
             </div>
           </div>
 
-          {/* Större visning */}
+          {/* Stor visning — favorit */}
           <div>
             <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-4">Förslag — stor visning</h3>
             <div className="bg-puck border border-rink-border rounded-lg p-8 sm:p-12 inline-flex items-center gap-5">
               <div className="w-12 h-12 bg-goal-red rounded-lg flex items-center justify-center font-display text-2xl font-bold text-white shrink-0">H</div>
               <div>
-                <p className="font-display text-2xl sm:text-3xl font-bold uppercase tracking-tight text-white leading-none">HopInHockey</p>
-                <p className="text-ice-muted text-xs sm:text-sm font-semibold tracking-[0.18em] uppercase mt-1 leading-none">Hitta en målvakt</p>
+                <p className="font-display text-[28px] sm:text-4xl font-bold uppercase text-white leading-none" style={{letterSpacing: '0.04em'}}>HOP<span className="text-goal-red">IN</span>HOCKEY</p>
+                <p className="text-ice-muted font-semibold uppercase leading-none mt-1.5" style={{fontSize: '0.6em', letterSpacing: '0.35em'}}>Hitta en målvakt</p>
               </div>
             </div>
           </div>

@@ -596,8 +596,8 @@ export default function Admin() {
             <div className="bg-rink border border-rink-border rounded-lg p-6 sm:p-8 inline-flex items-center gap-4">
               <div className="w-10 h-10 bg-goal-red rounded-lg flex items-center justify-center font-display text-xl font-bold text-white shrink-0">H</div>
               <div>
-                <p className="font-display text-xl sm:text-2xl font-bold uppercase tracking-tight text-white leading-none">Hitta Målvakt</p>
-                <p className="text-ice-muted text-[10px] sm:text-xs font-semibold tracking-[0.2em] uppercase mt-1 leading-none">Aldrig tomt i buren</p>
+                <p className="font-display text-2xl sm:text-3xl font-bold uppercase tracking-tight text-white leading-none">Hitta Målvakt</p>
+                <p className="text-ice-muted text-[10px] sm:text-[11px] font-semibold tracking-[0.15em] uppercase mt-1 leading-none">Aldrig tomt i buren</p>
               </div>
             </div>
           </div>

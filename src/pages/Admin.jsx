@@ -237,6 +237,7 @@ export default function Admin() {
     { key: 'requests', label: `Förfrågningar (${requests.length})` },
     { key: 'analytics', label: 'Dataanalys' },
     { key: 'support', label: `Stöd (${supportCount})` },
+    { key: 'brand', label: 'Varumärke' },
   ]
 
   return (
@@ -542,6 +543,127 @@ export default function Admin() {
             </div>
           ))}
           {supportClicks.length === 0 && <p className="text-ice-muted">Inga klick ännu.</p>}
+        </div>
+      )}
+
+      {tab === 'brand' && (
+        <div className="space-y-8">
+          <p className="text-ice-muted text-sm">Intern sida — syns bara för admin. Jämför varumärkesförslag visuellt.</p>
+
+          {/* Nuvarande */}
+          <div>
+            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-3">Nuvarande</h3>
+            <div className="bg-rink border border-rink-border rounded-lg p-6 sm:p-8 inline-flex items-center gap-4">
+              <div className="w-10 h-10 bg-goal-red rounded-lg flex items-center justify-center font-display text-xl font-bold text-white shrink-0">H</div>
+              <div>
+                <p className="font-display text-xl sm:text-2xl font-bold uppercase tracking-tight text-white leading-none">Hobbyhockey</p>
+                <p className="text-ice-muted text-xs sm:text-sm tracking-wider uppercase mt-0.5">Hitta en målvakt</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Förslag A */}
+          <div>
+            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-3">Förslag A — Hitta Målvakten</h3>
+            <div className="space-y-4">
+              <div className="bg-rink border border-rink-border rounded-lg p-6 sm:p-8 inline-flex items-center gap-4">
+                <div className="w-10 h-10 bg-goal-red rounded-lg flex items-center justify-center font-display text-xl font-bold text-white shrink-0">H</div>
+                <div>
+                  <p className="font-display text-xl sm:text-2xl font-bold uppercase tracking-tight text-white leading-none">Hitta Målvakten</p>
+                  <p className="text-ice-muted text-xs sm:text-sm tracking-wider uppercase mt-0.5">Aldrig utan målvakt igen</p>
+                </div>
+              </div>
+              <div className="bg-rink border border-rink-border rounded-lg p-6 sm:p-8 inline-flex items-center gap-4">
+                <div className="w-10 h-10 bg-goal-red rounded-lg flex items-center justify-center font-display text-xl font-bold text-white shrink-0">H</div>
+                <div>
+                  <p className="font-display text-xl sm:text-2xl font-bold uppercase tracking-tight text-white leading-none">Hitta Målvakten</p>
+                  <p className="text-ice-muted text-xs sm:text-sm tracking-wider uppercase mt-0.5">Förfrågan ut. Målvakt in.</p>
+                </div>
+              </div>
+              <div className="bg-rink border border-rink-border rounded-lg p-6 sm:p-8 inline-flex items-center gap-4">
+                <div className="w-10 h-10 bg-goal-red rounded-lg flex items-center justify-center font-display text-xl font-bold text-white shrink-0">H</div>
+                <div>
+                  <p className="font-display text-xl sm:text-2xl font-bold uppercase tracking-tight text-white leading-none">Hitta Målvakten</p>
+                  <p className="text-ice-muted text-xs sm:text-sm tracking-wider uppercase mt-0.5">Veteranhockeyns målvaktsnätverk</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Förslag B */}
+          <div>
+            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-3">Förslag B — Buren</h3>
+            <div className="space-y-4">
+              <div className="bg-rink border border-rink-border rounded-lg p-6 sm:p-8 inline-flex items-center gap-4">
+                <div className="w-10 h-10 bg-goal-red rounded-lg flex items-center justify-center font-display text-xl font-bold text-white shrink-0">B</div>
+                <div>
+                  <p className="font-display text-xl sm:text-2xl font-bold uppercase tracking-tight text-white leading-none">Buren</p>
+                  <p className="text-ice-muted text-xs sm:text-sm tracking-wider uppercase mt-0.5">Hitta en målvakt</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Förslag C */}
+          <div>
+            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-3">Förslag C — Vakta</h3>
+            <div className="space-y-4">
+              <div className="bg-rink border border-rink-border rounded-lg p-6 sm:p-8 inline-flex items-center gap-4">
+                <div className="w-10 h-10 bg-goal-red rounded-lg flex items-center justify-center font-display text-xl font-bold text-white shrink-0">V</div>
+                <div>
+                  <p className="font-display text-xl sm:text-2xl font-bold uppercase tracking-tight text-white leading-none">Vakta</p>
+                  <p className="text-ice-muted text-xs sm:text-sm tracking-wider uppercase mt-0.5">Hitta en målvakt</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-rink-border pt-6">
+            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-3">Jämförelsetabell</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-rink-border">
+                    <th className="text-left py-2 text-ice-muted font-semibold">Namn</th>
+                    <th className="text-left py-2 text-ice-muted font-semibold">Domän</th>
+                    <th className="text-left py-2 text-ice-muted font-semibold">Varumärkesskydd</th>
+                    <th className="text-left py-2 text-ice-muted font-semibold">SEO</th>
+                    <th className="text-left py-2 text-ice-muted font-semibold">Skalbarhet</th>
+                  </tr>
+                </thead>
+                <tbody className="text-ice-muted">
+                  <tr className="border-b border-rink-border/50">
+                    <td className="py-2 text-white font-semibold">Hobbyhockey</td>
+                    <td className="py-2">hobbyhockey.se</td>
+                    <td className="py-2 text-goal-green">Starkt</td>
+                    <td className="py-2 text-yellow-400">Medel</td>
+                    <td className="py-2 text-yellow-400">Bred men vag</td>
+                  </tr>
+                  <tr className="border-b border-rink-border/50">
+                    <td className="py-2 text-white font-semibold">Hitta Målvakten</td>
+                    <td className="py-2">hittamalvakten.se</td>
+                    <td className="py-2 text-yellow-400">Svagare</td>
+                    <td className="py-2 text-goal-green">Stark</td>
+                    <td className="py-2 text-yellow-400">Bundet till målvakt</td>
+                  </tr>
+                  <tr className="border-b border-rink-border/50">
+                    <td className="py-2 text-white font-semibold">Buren</td>
+                    <td className="py-2">buren.se</td>
+                    <td className="py-2 text-goal-green">Starkt</td>
+                    <td className="py-2 text-yellow-400">Medel</td>
+                    <td className="py-2 text-goal-green">Bandy, fotboll</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 text-white font-semibold">Vakta</td>
+                    <td className="py-2">vakta.se</td>
+                    <td className="py-2 text-goal-green">Starkt</td>
+                    <td className="py-2 text-yellow-400">Medel</td>
+                    <td className="py-2 text-goal-green">Alla sporter</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       )}
     </div>

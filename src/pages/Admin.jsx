@@ -602,6 +602,41 @@ export default function Admin() {
             </div>
           </div>
 
+          {/* Förslag — Hop In Hockey */}
+          <div>
+            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-3">Förslag — Hop In Hockey</h3>
+            <div className="space-y-4">
+              <div className="bg-rink border border-rink-border rounded-lg p-6 sm:p-8 inline-flex items-center gap-4">
+                <div className="w-10 h-10 bg-goal-red rounded-lg flex items-center justify-center font-display text-xl font-bold text-white shrink-0">H</div>
+                <div>
+                  <p className="font-display text-2xl sm:text-3xl font-bold uppercase tracking-tight text-white leading-none">HopInHockey</p>
+                  <p className="text-ice-muted text-[10px] sm:text-[11px] font-semibold tracking-[0.15em] uppercase mt-1 leading-none">Hitta en målvakt</p>
+                </div>
+              </div>
+              <div className="bg-rink border border-rink-border rounded-lg p-6 sm:p-8 inline-flex items-center gap-4">
+                <div className="w-10 h-10 bg-goal-red rounded-lg flex items-center justify-center font-display text-xl font-bold text-white shrink-0">H</div>
+                <div>
+                  <p className="font-display text-2xl sm:text-3xl font-bold uppercase tracking-tight text-white leading-none">Hop In Hockey</p>
+                  <p className="text-ice-muted text-[10px] sm:text-[11px] font-semibold tracking-[0.15em] uppercase mt-1 leading-none">Hitta en målvakt</p>
+                </div>
+              </div>
+              <div className="bg-rink border border-rink-border rounded-lg p-6 sm:p-8 inline-flex items-center gap-4">
+                <div className="w-10 h-10 bg-goal-red rounded-lg flex items-center justify-center font-display text-xl font-bold text-white shrink-0">H</div>
+                <div>
+                  <p className="font-display text-2xl sm:text-3xl font-bold uppercase tracking-tight text-white leading-none"><span className="text-goal-red">Hop</span>In<span className="text-goal-red">Hockey</span></p>
+                  <p className="text-ice-muted text-[10px] sm:text-[11px] font-semibold tracking-[0.15em] uppercase mt-1 leading-none">Hitta en målvakt</p>
+                </div>
+              </div>
+              <div className="bg-rink border border-rink-border rounded-lg p-6 sm:p-8 inline-flex items-center gap-4">
+                <div className="w-10 h-10 bg-goal-red rounded-lg flex items-center justify-center font-display text-xl font-bold text-white shrink-0">H</div>
+                <div>
+                  <p className="font-display text-2xl sm:text-3xl font-bold uppercase tracking-tight text-white leading-none">Hop<span className="text-goal-red">In</span>Hockey</p>
+                  <p className="text-ice-muted text-[10px] sm:text-[11px] font-semibold tracking-[0.15em] uppercase mt-1 leading-none">Hitta en målvakt</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Förslag B */}
           <div>
             <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-3">Förslag B — Buren</h3>

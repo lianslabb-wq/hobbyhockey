@@ -1,4 +1,4 @@
-# Hobbyhockey — UI/UX-strategi
+# HopInHockey — UI/UX-strategi
 
 ## Designprinciper
 - Mörk, professionell hockeykänsla

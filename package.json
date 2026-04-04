@@ -1,6 +1,8 @@
 {
-  "name": "hobbyhockey",
+  "name": "hopinhockey",
   "private": true,
+  "version": "1.0.0",
+  "description": "Hitta en målvakt till ditt veteranhockeylag",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

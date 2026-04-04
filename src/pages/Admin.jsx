@@ -238,6 +238,7 @@ export default function Admin() {
     { key: 'analytics', label: 'Dataanalys' },
     { key: 'support', label: `Stöd (${supportCount})` },
     { key: 'brand', label: 'Varumärke' },
+    { key: 'drift', label: 'Drift' },
   ]
 
   return (
@@ -598,6 +599,246 @@ export default function Admin() {
             <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-3">Domän</h3>
             <p className="text-white font-semibold">hopinhockey.se</p>
             <p className="text-ice-muted text-sm mt-1">Kort, tydligt, hockey i namnet. H-ikonen behålls. "Hitta en målvakt" som tagline.</p>
+          </div>
+        </div>
+      )}
+      {tab === 'drift' && (
+        <div className="space-y-8">
+          <p className="text-ice-muted text-sm">Driftguide — allt du behöver för att sköta HopInHockey utan Claude Code.</p>
+
+          {/* Tjänsteöversikt */}
+          <div>
+            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-4">Externa tjänster</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+              <div className="bg-rink-light border border-rink-border rounded-lg p-5">
+                <h4 className="text-white font-semibold mb-1">Vercel</h4>
+                <p className="text-ice-muted text-xs mb-3">Hosting och deployment. Auto-deploy vid push till main.</p>
+                <a href="https://vercel.com/lianslabb-9090s-projects/hobbyhockey" target="_blank" rel="noopener" className="text-jersey-blue text-xs hover:text-jersey-blue-light transition-colors">Öppna dashboard →</a>
+                <div className="mt-3 text-xs text-ice-muted space-y-1">
+                  <p className="font-semibold text-white">Vanliga uppgifter:</p>
+                  <ol className="list-decimal list-inside space-y-1">
+                    <li>Kolla deploy-status under Deployments</li>
+                    <li>Domäninställningar under Settings → Domains</li>
+                    <li>Env-variabler under Settings → Environment Variables</li>
+                  </ol>
+                </div>
+              </div>
+
+              <div className="bg-rink-light border border-rink-border rounded-lg p-5">
+                <h4 className="text-white font-semibold mb-1">Supabase</h4>
+                <p className="text-ice-muted text-xs mb-3">Databas, autentisering och Row Level Security.</p>
+                <a href="https://supabase.com/dashboard" target="_blank" rel="noopener" className="text-jersey-blue text-xs hover:text-jersey-blue-light transition-colors">Öppna dashboard →</a>
+                <div className="mt-3 text-xs text-ice-muted space-y-1">
+                  <p className="font-semibold text-white">Vanliga uppgifter:</p>
+                  <ol className="list-decimal list-inside space-y-1">
+                    <li>Se/redigera användare: Authentication → Users</li>
+                    <li>Köra SQL: SQL Editor (vänstermenyn)</li>
+                    <li>Auth-inställningar: Authentication → URL Configuration</li>
+                    <li>API-nycklar: Settings → API</li>
+                  </ol>
+                </div>
+              </div>
+
+              <div className="bg-rink-light border border-rink-border rounded-lg p-5">
+                <h4 className="text-white font-semibold mb-1">GitHub</h4>
+                <p className="text-ice-muted text-xs mb-3">Källkod och versionshantering.</p>
+                <a href="https://github.com/lianslabb-wq/hobbyhockey" target="_blank" rel="noopener" className="text-jersey-blue text-xs hover:text-jersey-blue-light transition-colors">Öppna repo →</a>
+                <div className="mt-3 text-xs text-ice-muted space-y-1">
+                  <p className="font-semibold text-white">Viktigt:</p>
+                  <ol className="list-decimal list-inside space-y-1">
+                    <li>Repo heter fortfarande "hobbyhockey" på GitHub</li>
+                    <li>Push till main = auto-deploy till Vercel</li>
+                    <li>All historik finns i git log</li>
+                  </ol>
+                </div>
+              </div>
+
+              <div className="bg-rink-light border border-rink-border rounded-lg p-5">
+                <h4 className="text-white font-semibold mb-1">Loopia</h4>
+                <p className="text-ice-muted text-xs mb-3">Domänregistrar för hopinhockey.se.</p>
+                <a href="https://www.loopia.se/logiain/" target="_blank" rel="noopener" className="text-jersey-blue text-xs hover:text-jersey-blue-light transition-colors">Öppna kundzon →</a>
+                <div className="mt-3 text-xs text-ice-muted space-y-1">
+                  <p className="font-semibold text-white">Viktigt:</p>
+                  <ol className="list-decimal list-inside space-y-1">
+                    <li>Namnservrar pekar till Vercel (ns1/ns2.vercel-dns.com)</li>
+                    <li>Domänen förnyas årligen (~100-150 kr)</li>
+                    <li>DNS hanteras av Vercel, inte Loopia</li>
+                  </ol>
+                </div>
+              </div>
+
+              <div className="bg-rink-light border border-rink-border rounded-lg p-5">
+                <h4 className="text-white font-semibold mb-1">Umami</h4>
+                <p className="text-ice-muted text-xs mb-3">Webbanalys — cookiefri besöksstatistik.</p>
+                <a href="https://cloud.umami.is" target="_blank" rel="noopener" className="text-jersey-blue text-xs hover:text-jersey-blue-light transition-colors">Öppna dashboard →</a>
+                <div className="mt-3 text-xs text-ice-muted space-y-1">
+                  <p className="font-semibold text-white">Viktigt:</p>
+                  <ol className="list-decimal list-inside space-y-1">
+                    <li>Script-ID: 1de76047-d4fe-4484-9d04-916929630f7e</li>
+                    <li>Scriptet laddas i index.html</li>
+                    <li>Ingen cookie-banner behövs (cookiefri)</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Env-variabler */}
+          <div className="border-t border-rink-border pt-6">
+            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-4">Miljövariabler</h3>
+            <div className="bg-rink-light border border-rink-border rounded-lg p-5">
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b border-rink-border">
+                      <th className="text-left py-2 text-ice-muted font-semibold">Variabel</th>
+                      <th className="text-left py-2 text-ice-muted font-semibold">Var den används</th>
+                      <th className="text-left py-2 text-ice-muted font-semibold">Hittas i</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-ice-muted">
+                    <tr className="border-b border-rink-border/50">
+                      <td className="py-2 text-white font-mono">VITE_SUPABASE_URL</td>
+                      <td className="py-2">Supabase API-anslutning</td>
+                      <td className="py-2">Supabase → Settings → API</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 text-white font-mono">VITE_SUPABASE_ANON_KEY</td>
+                      <td className="py-2">Supabase publik nyckel</td>
+                      <td className="py-2">Supabase → Settings → API</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-ice-muted text-xs mt-3">Uppdatera i Vercel: Settings → Environment Variables. Redeploy krävs efter ändring.</p>
+            </div>
+          </div>
+
+          {/* Deploy-guide */}
+          <div className="border-t border-rink-border pt-6">
+            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-4">Hur man deployar</h3>
+            <div className="bg-rink-light border border-rink-border rounded-lg p-5 text-xs text-ice-muted space-y-2">
+              <ol className="list-decimal list-inside space-y-2">
+                <li>Gör ändringar i koden lokalt</li>
+                <li><span className="text-white font-mono">git add .</span> → staga ändringarna</li>
+                <li><span className="text-white font-mono">git commit -m "Beskrivning"</span> → committa</li>
+                <li><span className="text-white font-mono">git push</span> → pushar till GitHub</li>
+                <li>Vercel deployar automatiskt inom ~1 minut</li>
+                <li>Kolla status på <a href="https://vercel.com/lianslabb-9090s-projects/hobbyhockey/deployments" target="_blank" rel="noopener" className="text-jersey-blue hover:text-jersey-blue-light transition-colors">Vercel Deployments</a></li>
+              </ol>
+            </div>
+          </div>
+
+          {/* Felsökning */}
+          <div className="border-t border-rink-border pt-6">
+            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-4">Felsökning</h3>
+            <div className="space-y-4">
+
+              <div className="bg-rink-light border border-rink-border rounded-lg p-5">
+                <h4 className="text-white font-semibold text-sm mb-2">Sidan visar gammal version / svart skärm</h4>
+                <ol className="list-decimal list-inside text-xs text-ice-muted space-y-1">
+                  <li>Tryck <span className="text-white">Cmd+Shift+R</span> (hård omladdning)</li>
+                  <li>Rensa cache: Chrome → Inställningar → Rensa webbdata</li>
+                  <li>Kolla att senaste deploy lyckades på <a href="https://vercel.com/lianslabb-9090s-projects/hobbyhockey/deployments" target="_blank" rel="noopener" className="text-jersey-blue hover:text-jersey-blue-light transition-colors">Vercel</a></li>
+                </ol>
+              </div>
+
+              <div className="bg-rink-light border border-rink-border rounded-lg p-5">
+                <h4 className="text-white font-semibold text-sm mb-2">Användare kan inte registrera sig / "Rate limit"</h4>
+                <ol className="list-decimal list-inside text-xs text-ice-muted space-y-1">
+                  <li>Supabase Free har limit på 2 auth-mejl per timme</li>
+                  <li>Användaren behöver vänta ~1 timme och försöka igen</li>
+                  <li>Onboarda max 2 nya användare i taget</li>
+                  <li>Vid skalning: uppgradera till Supabase Pro ($25/mån) eller lägg till Resend</li>
+                </ol>
+              </div>
+
+              <div className="bg-rink-light border border-rink-border rounded-lg p-5">
+                <h4 className="text-white font-semibold text-sm mb-2">Lösenordsåterställning fungerar inte</h4>
+                <ol className="list-decimal list-inside text-xs text-ice-muted space-y-1">
+                  <li>Gå till <a href="https://supabase.com/dashboard" target="_blank" rel="noopener" className="text-jersey-blue hover:text-jersey-blue-light transition-colors">Supabase</a> → Authentication → URL Configuration</li>
+                  <li>Kontrollera att Site URL är <span className="text-white">https://hopinhockey.se</span></li>
+                  <li>Kontrollera att <span className="text-white">https://hopinhockey.se</span> finns under Redirect URLs</li>
+                  <li>Spara och testa igen</li>
+                </ol>
+              </div>
+
+              <div className="bg-rink-light border border-rink-border rounded-lg p-5">
+                <h4 className="text-white font-semibold text-sm mb-2">hopinhockey.se laddas inte</h4>
+                <ol className="list-decimal list-inside text-xs text-ice-muted space-y-1">
+                  <li>Kolla <a href="https://vercel.com/lianslabb-9090s-projects/hobbyhockey/settings/domains" target="_blank" rel="noopener" className="text-jersey-blue hover:text-jersey-blue-light transition-colors">Vercel → Domains</a> — ska vara gröna bockar</li>
+                  <li>Om "Invalid Configuration": DNS har inte propagerat ännu (vänta)</li>
+                  <li>Kolla att Loopia namnservrar fortfarande pekar på ns1/ns2.vercel-dns.com</li>
+                  <li>hobbyhockey.vercel.app fungerar alltid som backup</li>
+                </ol>
+              </div>
+
+              <div className="bg-rink-light border border-rink-border rounded-lg p-5">
+                <h4 className="text-white font-semibold text-sm mb-2">Behöver ta bort en användare / lag / målvakt</h4>
+                <ol className="list-decimal list-inside text-xs text-ice-muted space-y-1">
+                  <li>Gå till Lag- eller Målvakts-fliken här i admin</li>
+                  <li>Klicka "Radera" på rätt post</li>
+                  <li>Favoriter och förfrågningar rensas automatiskt (cascade delete)</li>
+                  <li>Auth-kontot finns kvar i Supabase — ta bort under Authentication → Users om det behövs</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+
+          {/* Arkitekturöversikt */}
+          <div className="border-t border-rink-border pt-6">
+            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-4">Arkitektur</h3>
+            <div className="bg-rink-light border border-rink-border rounded-lg p-5 text-xs text-ice-muted space-y-2">
+              <div className="grid grid-cols-2 gap-2">
+                <div><span className="text-white font-semibold">Frontend:</span> React 19 + Vite 7</div>
+                <div><span className="text-white font-semibold">Styling:</span> Tailwind CSS 4</div>
+                <div><span className="text-white font-semibold">Backend:</span> Supabase (PostgreSQL)</div>
+                <div><span className="text-white font-semibold">Auth:</span> Supabase Auth</div>
+                <div><span className="text-white font-semibold">Hosting:</span> Vercel</div>
+                <div><span className="text-white font-semibold">Domän:</span> hopinhockey.se (Loopia)</div>
+                <div><span className="text-white font-semibold">Analys:</span> Umami (cookiefri)</div>
+                <div><span className="text-white font-semibold">Repo:</span> github.com/lianslabb-wq/hobbyhockey</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Databastabeller */}
+          <div className="border-t border-rink-border pt-6">
+            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-4">Databastabeller</h3>
+            <div className="bg-rink-light border border-rink-border rounded-lg p-5">
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b border-rink-border">
+                      <th className="text-left py-2 text-ice-muted font-semibold">Tabell</th>
+                      <th className="text-left py-2 text-ice-muted font-semibold">Beskrivning</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-ice-muted">
+                    <tr className="border-b border-rink-border/50"><td className="py-1.5 text-white font-mono">teams</td><td className="py-1.5">Registrerade lag</td></tr>
+                    <tr className="border-b border-rink-border/50"><td className="py-1.5 text-white font-mono">goalies</td><td className="py-1.5">Registrerade målvakter</td></tr>
+                    <tr className="border-b border-rink-border/50"><td className="py-1.5 text-white font-mono">sessions</td><td className="py-1.5">Istider (datum, tid, rink)</td></tr>
+                    <tr className="border-b border-rink-border/50"><td className="py-1.5 text-white font-mono">requests</td><td className="py-1.5">Förfrågningar (kopplade till sessions)</td></tr>
+                    <tr className="border-b border-rink-border/50"><td className="py-1.5 text-white font-mono">responses</td><td className="py-1.5">Målvaktssvar på förfrågningar</td></tr>
+                    <tr className="border-b border-rink-border/50"><td className="py-1.5 text-white font-mono">favorites</td><td className="py-1.5">Lag → målvakt favoriter</td></tr>
+                    <tr className="border-b border-rink-border/50"><td className="py-1.5 text-white font-mono">goalie_favorites</td><td className="py-1.5">Målvakt → lag favoriter</td></tr>
+                    <tr className="border-b border-rink-border/50"><td className="py-1.5 text-white font-mono">goalie_directory</td><td className="py-1.5">View — begränsad målvaktsinfo för lag</td></tr>
+                    <tr><td className="py-1.5 text-white font-mono">support_clicks</td><td className="py-1.5">Klick på "Stöd oss"</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          {/* Kontakter */}
+          <div className="border-t border-rink-border pt-6">
+            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-ice-muted mb-4">Kontakter</h3>
+            <div className="bg-rink-light border border-rink-border rounded-lg p-5 text-xs text-ice-muted space-y-2">
+              <p><span className="text-white font-semibold">Admin-mejl:</span> lianslabb@gmail.com (hardcodad i is_admin())</p>
+              <p><span className="text-white font-semibold">Kontaktmejl (publik):</span> lianslabb@gmail.com</p>
+              <p><span className="text-white font-semibold">GTM:</span> Rickard</p>
+            </div>
           </div>
         </div>
       )}
